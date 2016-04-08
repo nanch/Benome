@@ -1,0 +1,17 @@
+CACHE MANIFEST
+# rev 007
+
+# Libs
+/static/js/d3.min.js
+
+# App Code
+/static/js/bundle.js
+
+# CSS
+/static/css/Benome.css
+
+# Images
+/static/images/background.jpg
+/static/images/background-light.jpg
+/static/images/right.png
+/static/images/left.png

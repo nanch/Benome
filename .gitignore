@@ -1,0 +1,6 @@
+Archive/*
+*static*
+*deploy*
+*node_modules*
+/*.conf
+/test/

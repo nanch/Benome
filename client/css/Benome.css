@@ -1,0 +1,1615 @@
+/*
+Copyright 2016 Steve Hazel
+
+This file is part of Benome.
+
+Benome is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License version 3
+as published by the Free Software Foundation.
+
+Benome is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with Benome. If not, see http://www.gnu.org/licenses/.
+*/
+
+html {
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    background-color: #000;
+}
+
+.benome-container {
+    background-color: #000;
+    
+}
+
+.benome-container-bg-solid {
+    background-image: none;
+}
+
+.benome-container-bg-light {
+    background-image: url(/static/images/background-light.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.benome-container-bg-dark {
+    background-image: url(/static/images/background.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.benome {
+    position: absolute;
+    color: #aaa;
+    font-size: 25px;
+    font-family: verdana;
+
+    left: 0%;
+    top: 0%;
+    height: 100%;
+    width: 100%;
+
+    overflow: hidden;
+    
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+.benome .activity-interval-view {
+    border-bottom: 2px solid black;
+    border-radius: 0.25em;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 6em;
+    position: absolute;
+    cursor: pointer;
+}
+
+.benome .activity-interval-view-left {
+    left: 0;
+    border-left: 1px solid black;
+    text-align: left;
+    padding-left: 0.25em;
+}
+
+.benome .activity-interval-view-right {
+    right: 0;
+    border-right: 1px solid black;
+    text-align: right;
+    padding-right: 0.25em;
+}
+
+.benome .activity-interval-view .label {
+    position: absolute;
+    left: 0.1em;
+    bottom: 0;
+    width: 100%;
+    text-align: left;
+    pointer-events: none;
+}
+
+/* 
+#X {
+    z-index: 1;
+    left: 60%;
+    top: 60%;
+    height: 40%;
+    width: 40%;
+    background-color: #333;
+}
+
+#Y {
+    z-index: 2;
+    left: 10%;
+    top: 10%;
+    height: 50%;
+    width: 50%;
+    background-color: #222;
+}
+
+#Z {
+    z-index: 3;
+    left: 0%;
+    top: 0%;
+    height: 60%;
+    width: 60%;
+    background-color: #111;
+} */
+
+.benome .press-indicator {
+    position: absolute;
+    text-align: center;
+    border-radius: 500px;
+    left: 50px;
+    top: 50px;
+    width: 6.5em;
+    height: 6.5em;
+    /* border: 1em solid #779; */
+    background-color: #779;
+    /* box-shadow: 0px 0px 4em 4em #779; */
+    z-index: 1200000000;
+    display: none;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.benome .simple-view {
+    position: absolute;
+    text-align: center;
+    border-radius: 1000px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    cursor: pointer;
+    overflow: hidden;
+
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: rgba(50,50,50,0.5);
+}
+
+.benome .simple-view-hq {
+    box-shadow: 0px 0px 0.5em 0.025em rgba(0, 0, 0, 0.75), -0.5em 0.5em 0.5em 0.015em rgba(0, 0, 0, 0.75);
+}
+
+.benome .new-focus-feedback {
+    box-shadow: 0px 0px 0.75em 0.5em cyan, inset 0px 0px 0.6em 0.1em green !important;
+}
+
+.benome .simple-view .simple-surface-view {
+    padding: 0.5em;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.benome .simple-view > div > div.label {
+    position: absolute;
+    left: 12%;
+    height: 40%;
+    top: 30%;
+    width: 76%;
+
+    outline: none;
+    cursor: pointer;
+    pointer-events: none;
+        
+    text-indent:0px;
+    display:inline-block;
+    
+    font-style:normal;
+    text-decoration:none;
+    text-align:center;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
+    overflow: hidden;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+
+    z-index: 3;
+}
+
+.benome .simple-view canvas {
+    z-index: 2;
+    pointer-events: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.benome .simple-view-trace-root {
+    /* box-shadow: 0px 0px 0.35em 0.25em #ccc; */
+    border: 0.15em solid #ccc;
+}
+
+.benome .simple-view  .touchactive {
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    opacity: 0.95;
+}
+
+.benome form {
+    padding: 0;
+    margin: 0;
+}
+
+.benome input {
+    user-select: text;
+    -moz-user-select: text;
+    background-color : #222; 
+    color: #aaa;
+    border: 0;
+    outline: none;
+}
+
+.benome .activity-input {
+    position: absolute;
+    min-width: 30%;
+    max-width: 56%;
+    bottom: 0.5em;
+    left: 2%;
+    text-align: left;
+    z-index: 1200000000;
+}
+
+.benome .activity-input input {
+    width: 100%;
+    font-size: 1em;
+    border-radius: 0.25em;
+}
+
+.benome .history-container {
+    position: absolute;
+    top: 3%;
+    padding-top: 0em;
+    left: 2%;
+    height: 95%;
+    width: 96%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    z-index: 1000000500;
+    display: none;
+    /* pointer-events: none; */
+    font-size: 0.8em;
+}
+
+.benome .viz-container {
+    position: absolute;
+    top: 71%;
+    padding-top: 0em;
+    left: 2%;
+    height: 26%;
+    width: 96%;
+    font-size: 0.7em;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    z-index: 1000000000;
+    background-color: #111;
+    border-radius: 0.15em;
+    border: 1px solid #444;
+    display: none;
+}
+
+.benome .timeline-container {
+    position: absolute;
+    top: 4em;
+    padding-top: 0em;
+    left: 65%;
+    width: 34%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    color: #bbb;
+    padding: 0.15em;
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+    display: none;
+    border-radius: 0.25em;
+    background-color: #111;
+    z-index: 900000050;
+}
+
+.benome .timeline-time-item {
+    background-color: #111;
+    color: #888;
+    display: inline-block;
+    text-align: left;
+    padding-left: 1em;
+    font-size: 0.5em;
+    height: 1.2em;
+    float: left;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+.benome .timeline-time-item-mobile {
+    font-size: 0.75em;
+}
+
+.benome .timeline-time-item-highlight {
+    font-weight: bold;
+    font-size: 0.7em;
+    padding-left: 0.6em;
+}
+
+.benome .context-label {
+    width: 100%;
+    height: 1em;
+    font-size: 0.5em;
+    color: #ccc;
+}
+
+.benome .overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    opacity: 0.5;
+    z-index: 1000000000;
+    display: none;
+}
+
+.benome .working-overlay {
+    z-index: 2100000000;
+    text-align: center;
+    opacity: 0.5;
+    display: none;
+}
+
+.benome .working-overlay .text {
+    margin-top: 50%;
+    width: 8em;
+    height: 1.4em;
+    color: #ccc;
+    font-size: 2em;
+    margin-left: auto;
+    margin-right: auto;
+    cursor: default;
+    background-color: #222;
+    border-radius: 0.5em;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+.benome .point-list-view {
+    cursor: pointer;
+    color: #222;
+    margin-top: 0.06em;
+    margin-bottom: 0.075em;
+    padding-top: 0.025em;
+    padding-bottom: 0.05em;
+    padding-left: 0.1em;
+    display: inline-block;
+    float: left;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-radius: 0.25em;
+    height: 1.3em;
+    width: 100%;
+    pointer-events: auto;
+}
+
+.benome .point-list-view > .label {
+    float: left;
+    width: 95%;
+    overflow: hidden;
+    white-space: nowrap;
+    pointer-events: none;
+    text-align: left;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+.benome .point-list-view-mobile {
+    font-size: 1.75em;
+}
+
+.benome .point-list-view > .time {
+    float: right;
+    width: 20%;
+    font-size: 0.7em;
+    text-align: right;
+}
+
+.benome .context-actions {
+    position: absolute;
+    width: 40%;
+    min-width: 20em;
+    height: 25%;
+    min-height: 8em;
+    text-align: center;
+    z-index: 1000000005;
+    background-color: #444;
+    border-radius: 1em;
+    padding: 0.25em;
+    display: none;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.benome .context-actions .button {
+    background-color: #777;
+    color: black;
+    width: 5em;
+    height: 1.5em;
+    font-size: 1.15em;
+    margin: 0.25em;
+    float: left;
+    display: inline;
+    border-radius: 0.25em;
+    border: 0.12em solid black;
+}
+
+.benome .context-actions .button:hover {
+    background-color: #aaa;
+}
+
+.benome .context-actions .edit-label {
+    float: left;
+}
+
+.benome .context-actions .label-input {
+    float: left;
+}
+
+.benome .context-actions input {
+    width: 8em;
+    float: left;
+    font-size: 1.3em;
+    margin: 0.25em;
+}
+
+.benome .quick-context-actions {
+    position: absolute;
+    min-width: 10em;
+    height: 2em;
+    z-index: 1000000605;
+    background-color: #333;
+    border-radius: 0.5em;
+    padding: 0.25em;
+    display: none;
+    font-size: 1.3em;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.benome .quick-context-actions .edit-label {
+    width: 100%;
+}
+
+.benome .quick-context-actions .label-input {
+    width: 100%;
+}
+
+.benome .quick-context-actions input {
+    width: 81%;
+    float: left;
+    font-size: 1em;
+    margin: 1%;
+}
+
+.benome .quick-context-actions .button {
+    width: 15%;
+    float: left;
+    margin: 1%;
+    font-size: 1em;
+    cursor: pointer;
+
+    background-color: #777;
+    color: black;
+    display: inline;
+
+    text-align: center;
+}
+
+.benome .quick-context-actions .button:hover {
+    background-color: #aaa;
+}
+
+.benome .history {
+    height: 100%;
+    white-space: nowrap;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    pointer-events: auto;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+.benome .history .activity-column {
+    display: inline-block;
+    min-height: 5em;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.benome .history .activity-column .header {
+    height: 1.7em;
+    padding: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 0.2em solid transparent;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.benome .point-target {
+    height: 5em;
+    background-color: #222;
+    border: #444 dashed;
+    border-radius: 0.5em;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.benome .history .activity-column .header-highlight{
+    border-color: orange;
+}
+
+.benome .history .activity-column .activity {
+    cursor: pointer;
+    pointer-events: auto;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    border-radius: 0.15em;
+}
+
+.benome .history .activity-column .header {
+    background-color: #555;
+    color: #ccc;
+    text-align: center;
+    pointer-events: none;
+}
+
+.benome .score {
+    position: absolute;
+    left: 2%;
+    top: 3em;
+    width: 5%;
+    height: 1.5em;
+    color: #ccc;
+    font-weight: bold;
+}
+
+.benome .color-key {
+    position: absolute;
+    left: 10%;
+    top: 1%;
+    width: 85%;
+    height: 1.5em;
+    color: #ccc;
+    font-weight: bold;
+}
+
+.benome .context-color {
+    float: left;
+    margin: 0.2em;
+    padding: 0.1em;
+    cursor: pointer;
+}
+
+.benome .graph-depth-container {
+    position: absolute;
+    left: 70%;
+    bottom: 2%;
+    width: 25%;
+    height: 1.5em;
+    color: #ccc;
+    font-weight: bold;
+}
+
+.benome .graph-depth-container .graph-depth {
+    float: left;
+    margin: 0.3em;
+    padding: 0.3em;
+    background-color: orange;
+    color: black;
+    cursor: pointer;
+}
+
+.benome .window-size-container {
+    position: absolute;
+    left: 5%;
+    bottom: 2%;
+    width: 60%;
+    height: 1.5em;
+    color: #ccc;
+    font-weight: bold;
+}
+
+.benome .window-size-container .window-size {
+    float: left;
+    margin: 0.3em;
+    padding: 0.3em;
+    background-color: orange;
+    color: black;
+    cursor: pointer;
+}
+
+.benome .streamgraph-image {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+}
+
+.benome .auto-action-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000000000;
+    pointer-events: none;
+    display: none;
+}
+
+.benome .auto-action-overlay {
+    position: absolute;
+    top: 10%;
+    left: 0;
+    width: 6em;
+    height: 80%;
+    background-color: #222;
+    border: 0.075em solid #444;
+    border-bottom-right-radius: 0.35em;
+    border-top-right-radius: 0.35em;
+    opacity: 0.85;
+    z-index: 1000000005;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    text-align: center;
+    pointer-events: none;
+    color: #ccc;
+}
+
+.benome .auto-action-overlay .elapsed {
+    position: absolute;
+    top: 3%;
+    width: 100%;
+    font-size: 1.5em;
+    text-align: center;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.benome .button2 {
+    position: absolute;
+    height: 1.5em;
+    border-radius: 0.5em;
+    border: 0.075em solid #999;
+    pointer-events: auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    cursor: pointer;
+    text-align: center;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    padding-left: 0.1em;
+    padding-right: 0.1em;
+    width: 4em;
+}
+
+.benome .auto-action-overlay .cancel {
+    top: 13%;
+    left: 10%;
+    width: 80%;
+    font-size: 0.85em;
+    background-color: #AA0000;
+}
+
+.benome .auto-action-overlay .done1 {
+    top: 50%;
+    width: 90%;
+    left: 5%;
+    background-color: #00AA00;
+}
+
+.benome .auto-action-overlay-details .add {
+    top: 86%;
+    left: 50%;
+    background-color: #00AA00;
+}
+
+.benome .auto-action-overlay-details .done2 {
+    top: 86%;
+    right: 10%;
+    background-color: #00AA00;
+}
+
+.benome .auto-action-overlay .more {
+    bottom: 5%;
+    left: 10%;
+    width: 80%;
+    background-color: #aa7500;
+}
+
+.benome .auto-action-overlay-details {
+    position: absolute;
+    top: 12%;
+    left: 6em;
+    width: 20em;
+    height: 74%;
+    background-color: #222;
+    border: 0.075em solid #444;
+    border-bottom-right-radius: 0.35em;
+    border-top-right-radius: 0.35em;
+    opacity: 0.7;
+    z-index: 1000000003;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    color: #ccc;
+    pointer-events: auto;
+    display: none;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+.benome .auto-action-overlay-details textarea {
+    position: absolute;
+    left: 10%;
+    top: 20%;
+    width: 80%;
+    height: 60%;
+    background-color: #000;
+    color: #aaa;
+    font-size: 1.25em;
+    outline: none;
+    border: 1px solid #666;
+    margin: 0.25em;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    user-select: text;
+}
+
+.benome .creator-view, .benome .destroyer-view, .benome .login-view {
+    position: absolute;
+    z-index: 900000045;
+    text-align: center;
+    border-radius: 1000px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    outline: none;
+    cursor: pointer;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    opacity: 0.7;
+}
+
+.benome .creator-view {
+    background-color: orange;
+    box-shadow: 0px 0px 3.5em 0.5em orange, 0px 0px 0.5em 0.15em orange;
+}
+
+.benome .destroyer-view {
+    background-color: black;
+    opacity: 0.5;
+    box-shadow: 0px 0px 3.5em 0.5em blue, 0px 0px 0.5em 0.15em blue;
+}
+
+.benome .login-view {
+    display: none;
+    opacity: 1.0;
+    background-color: orange;
+    box-shadow: 0px 0px 3.5em 0.5em orange, 0px 0px 0.5em 0.15em orange;
+}
+
+.benome .login-view .title {
+    font-size: 2em;
+    font-color: #888;
+    font-family: sans-serif;
+    font-size: 2.5em;
+    width: 200%;
+    text-align: center;
+    margin-left: -50%;
+    margin-top: -1.5em;
+}
+
+.benome .point-add-feedback {
+    position: absolute;
+    z-index: 900000046;
+    font-size: 1.25em;
+    overflow: hidden;
+    height: 1.25em;
+    min-width: 3em;
+    border-radius: 0.25em;
+    text-align: center;
+    white-space: nowrap;
+    padding-left: 0.25em;
+    padding-right: 0.25em;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    cursor: pointer;
+    display: none;
+}
+
+.benome .overlay-backing2 {
+    z-index: 1000000600;
+    opacity: 0.7;
+}
+
+.benome .overlay-backing4 {
+    z-index: 1000000600;
+    opacity: 0.7;
+}
+
+.benome .layer-overlay, .benome .layer-container {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+.benome .layer-overlay {
+    opacity: 0.8;
+    background-color: black;
+}
+
+.benome .point-action-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    font-size: 1.25em;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    display: none;
+    z-index: 1000000700;
+}
+
+.benome .point-actions {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    display: none;
+}
+
+.benome .point-actions .point-label {
+    width: 60%;
+    text-align: center;
+    left: 20%;
+    position: absolute;
+    top: 0.25em;
+    font-weight: bold;
+}
+
+.benome .point-modify-handle {
+    position: absolute;
+    width: 4em;
+    height: 1.25em;
+    background-color: #448;
+    color: #aaa;
+    border-radius: 0.25em;
+    text-align: center;
+
+    cursor: pointer;
+
+    z-index: 1000000005;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+
+    top: 15%;
+}
+
+.benome .point-actions .point-modify-line {
+    position: absolute;
+    height: 0.25em;
+    background-color: blue;
+}
+
+.benome .point-actions textarea {
+    position: absolute;
+    left: 15%;
+    top: 30%;
+    width: 70%;
+    height: 35%;
+    background-color: #000;
+    color: #aaa;
+    font-size: 1em;
+    outline: none;
+    border: 1px solid #666;
+    margin: 0.25em;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    user-select: text;
+}
+
+.benome .point-actions .delete-button {
+    background-color: #AA0000;
+    bottom: 2.5%;
+    left: 12.5%;
+}
+
+.benome .point-actions .cancel-button {
+    background-color: #AA7500;
+    bottom: 2.5%;
+    left: 50%;
+}
+
+.benome .point-actions .save-button {
+    background-color: #00AA00;
+    bottom: 2.5%;
+    left: 72.5%;
+}
+
+/* .benome .simple-view .focus-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius:500px;
+} */
+
+.benome .simple-view .detail-indicator {
+    position: absolute;
+    display: none;
+    left: 37.5%;
+    bottom: 5%;
+    background-color: #888;
+    opacity: 0.4;
+    border-radius: 25%;
+    cursor: pointer;
+    z-index: -3;
+    pointer-events: auto;
+}
+
+.benome .detail-spectrum {
+    position: absolute;
+    height: 2.5em;
+    width: 48%;
+    display: none;
+    opacity: 0.8;
+    z-index: 999999000;
+}
+
+.benome .detail-spectrum .detail-level {
+    cursor: pointer;
+    height: 100%;
+    width: 16.66%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    float: left;
+}
+
+.benome .detail-spectrum .detail-level-active {
+    border: 0.3em solid #337;
+}
+/* 
+.benome .simple-view .control-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius:500px;
+}
+
+.benome .simple-view .control-container .edit-label {
+    position: absolute;
+    top: 35%;
+    left: 5%;
+    width: 90%;
+}
+
+.benome .simple-view .control-container .label {
+    width: 75%;
+    float: left;
+    font-size: 1em;
+    margin: 1%;
+}
+
+.benome .simple-view .background-image {
+    position: absolute;
+    top: 25%;
+    left: 10%;
+    width: 80%;
+    height: 50%;
+    z-index: -5;
+    opacity: 0.35;
+}
+
+.benome .simple-view .background-image img {
+    width: 100%;
+    height: 100%;
+}
+
+.benome .simple-view .control-container .button {
+    position: absolute;
+    width: 4em;
+    font-size: 1em;
+    cursor: pointer;
+    background-color: #777;
+    color: black;
+    display: block;
+    text-align: center;
+    border-radius: 0.25em;
+}
+
+.benome .simple-view .control-container .button:hover {
+    background-color: #aaa;
+}
+
+.benome .simple-view .control-container .rename {
+    width: 20%;
+    right: 1%;
+    background-color: green;
+}
+
+.benome .simple-view .control-container .delete {
+    left: 30%;
+    bottom: 8%;
+    width: 40%;
+    background-color: red;
+} */
+
+.benome .admin-view {
+    position: absolute;
+    left: 10%;
+    top: 10%;
+    width: 80%;
+    height: 80%;
+    z-index: 1000000605;
+    background-color: #333;
+    border-radius: 0.5em;
+    padding: 0.25em;
+    display: none;
+    font-size: 1em;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.benome .admin-view .left-col {
+    float: left;
+    text-align: left;
+    min-width: 30%;
+    max-width: 95%;
+    padding: 0.5em;
+    padding: 1em;
+}
+
+.benome .admin-view .right-col {
+    float: right;
+    text-align: left;
+    min-width: 40%;
+    max-width: 95%;
+    padding: 1em;
+}
+
+.benome .admin-view .change-auth {
+    margin-bottom: 2em;
+}
+
+/* .benome .admin-view .logout, .benome .admin-view .fullscreen, .admin-view .export {
+    width: 100%;
+    text-align: center;
+} */
+
+.benome .admin-view input {
+    width: 12em;
+    font-size: 1em;
+    margin: 0.2em;
+    outline: 2px solid black;
+    padding: 0.1em;
+}
+
+.benome .admin-view .button {
+    width: 4em;
+    margin: 1%;
+    font-size: 1em;
+    cursor: pointer;
+
+    background-color: #777;
+    color: black;
+    display: inline-block;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+
+    text-align: center;
+    border: 0.12em solid black;
+    border-radius: 0.25em;
+}
+
+.benome .admin-view .toggle-fullscreen {
+    width: 6em;
+}
+
+.benome .admin-view .button:hover {
+    background-color: #aaa;
+}
+
+.benome div.close-admin {
+    position: absolute;
+    bottom: 1em;
+    right: 1em;
+    width: 4em;
+}
+
+.benome .login-view .authenticate {
+    position: absolute;
+    text-align: right;
+    top: 35%;
+    left: 15%;
+    width: 70%;
+}
+
+.benome .login-view .authenticate > form > div {
+    width: 100%;
+}
+
+.benome .login-view .authenticate .username {
+}
+
+.benome .login-view .authenticate .message {
+    color: red;
+    font-weight: bold;
+    text-align: center;
+}
+
+.benome .login-view .authenticate .button {
+    display: inline-block;
+    background-color: green;
+    border-radius: 0.25em;
+    padding-left: 0.25em;
+    padding-right: 0.25em;
+}
+
+.benome .login-view .authenticate input {
+    width: 100%;
+    font-size: 1em;
+    margin-bottom: 0.25em;
+    border-radius: 0.1em;
+    background-color: #BB8800;
+    outline: none;
+    color: #222;
+}
+
+.benome .login-view .authenticate input::placeholder,
+.benome .login-view .authenticate input::placeholder-shown,
+.benome .login-view .authenticate input::-moz-placeholder,
+.benome .login-view .authenticate input:-moz-placeholder {
+    color: #555;
+    opacity: 1;
+}
+
+ {
+    color: #555;
+    opacity: 1;
+}
+
+.benome .login-view .authenticate input::-webkit-input-placeholder {
+    color: #555;
+}
+
+.benome .login-view .authenticate input:-ms-placeholder {
+    color: #555;
+}
+
+/* These need to be last to ensure properties are overridden */
+
+.benome .drag-proxy {
+    opacity: 0.5 !important;
+    z-index: 5000000000 !important;
+    pointer-events: none !important;
+    position: absolute;
+    display: block;
+}
+
+.benome .drag-proxy-point {
+    position: absolute;
+    display: block;
+    width: 8em;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    height: 1.3em;
+    padding-left: 0.2em;
+    pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.benome .drag-proxy-creator, .benome .drag-proxy-destroyer {
+    left: 0;
+}
+
+.benome .drag-proxy-handle {
+    font-size: 1.5em;
+}
+
+.benome .drop-highlight {
+    box-shadow: 0px 0px 0.75em 0.5em orange, inset 0px 0px 0.6em 0.1em blue !important;
+}
+
+.benome .highlight {
+    box-shadow: 0px 0px 25px 10px #ccc, inset 0px 0px 10px 10px #ccc !important;
+    /* z-index: 2147483647 !important; */
+}
+
+
+.day-number {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 2em;
+    width: 20%;
+    font-weight: bold;
+    font-family: sans-serif;
+    text-align: left;
+    z-index: 2147483647 !important;
+    color: #ccc;
+    padding: 0.5em;
+}
+
+
+.attribute-text-textarea {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0%;
+    left: 0%;
+    font-size: 0.5em;
+    cursor: default;
+    pointer-events: auto;
+}
+
+.attribute-text-input {
+    position: absolute;
+    width: 80%;
+    left: 10%;
+    top: 20%;
+    height: 1.2em;
+    font-size: 0.8em;
+    cursor: default;
+    pointer-events: auto;
+}
+
+.benome .numeric-input, #numeric-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.benome .numeric-input .numeric-input-horiz {
+    position: absolute;
+    overflow: hidden;
+    background-color: black;
+    cursor: pointer;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    pointer-events: auto;
+}
+
+.benome .numeric-input .value-display {
+    position: absolute;
+    font-weight: bold;
+    font-size: 1em;
+    font-family: sans-serif;
+    text-align: center;
+    min-width: 2em;
+    height: 1em;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}
+
+.benome .numeric-input .current-value-container {
+    color: orange;
+    opacity: 1.0;
+    overflow: hidden;
+    z-index: 3000;
+    min-width: 0;
+    color: black;
+    text-align: center;
+}
+
+.benome .numeric-input .numeric-input-horiz .band-label {
+    color: cyan;
+    opacity: 0.25;
+    font-size: 0.66em;
+    top: 8px;
+}
+
+.benome .numeric-input .numeric-input-horiz .active-value {
+    color: green;
+    opacity: 0.8;
+    font-size: 1.33em;
+    top: -12px;
+    z-index: 2000;
+    min-width: 0;
+}
+
+.benome .numeric-input .numeric-input-horiz .refine-value {
+    color: blue;
+    opacity: 0.8;
+    font-size: 1.33em;
+    top: -12px;
+    z-index: 2000;
+    min-width: 0;
+}
+
+.benome .numeric-input .numeric-input-horiz .prev-value, .numeric-input-horiz .prev-value-two {
+    color: green;
+    opacity: 0.6;
+    top: 0px;
+    min-width: 1em;
+    background-color: orange;
+    margin-left: 2px;
+    margin-right: 2px;
+    border-radius: 0.25em;
+    pointer-events: auto;
+}
+
+.benome .numeric-input .numeric-input-horiz .prev-value:hover, .numeric-input-horiz .prev-value-two:hover {
+    background-color: yellow;
+    opacity: 1.0;
+    z-index: 1000;
+}
+
+.benome .numeric-input .prev-value-two {
+    position: relative;
+    display: block;
+    float: left;
+    height: 100%;
+}
+
+.benome .numeric-input .prev-value-gap {
+    position: relative;
+    display: block;
+    opacity: 0.8;
+    min-width: 1em;
+    top: 0px;
+    height: 100%;
+    pointer-events: auto;
+    float: left;
+}
+
+.benome .numeric-input .drag-value {
+    position: absolute;
+    font-weight: bold;
+    font-size: 1em;
+    font-family: sans-serif;
+    text-align: center;
+    width: 2em;
+    height: 1em;
+    top: 1px;
+    z-index: 2000;
+    background-color: yellow;
+    border-radius: 0.25em;
+    pointer-events: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}
+
+.benome .numeric-input .numeric-input-horiz .scroll-horiz {
+    width: 100%;
+    height: 100%;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
+    float: left;
+}
+
+.benome .numeric-input .numeric-input-horiz .scroll-horiz .scroll-left, .numeric-input-horiz .scroll-horiz .scroll-right {
+    position: absolute;
+    background-color: #333;
+
+    float: left;
+    cursor: pointer;
+    z-index: 2;
+
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.benome .numeric-input .numeric-input-horiz .scroll-horiz .scroll-left {
+    left: 0px;
+    height: 100%;
+
+    background-image: url(/static/images/left.png);
+}
+
+.benome .numeric-input .numeric-input-horiz .scroll-horiz .scroll-right {
+    right: 0px;
+    height: 100%;
+
+    background-image: url(/static/images/right.png);
+}
+
+.benome .numeric-input .numeric-input-horiz .scroll-horiz .horiz-container {
+    position: absolute;
+    height: 100%;
+    z-index: 1;
+
+    float: left;
+    color: #987;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.benome .numeric-input .numeric-input-horiz .scroll-horiz .horiz-container .inner-expanded {
+    background-color: #111;
+    width: 800%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.benome .numeric-input item-highlighted {
+    background-color: #aaaa00 !important;
+}
+
+.benome .numeric-input .numeric-input-horiz .scroll-horiz .horiz-container .item {
+    cursor: pointer;
+    text-align: center;
+    float: left;
+    background-color: #555;
+    padding: 0.1em;
+    border-radius: 0.25em;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.benome .numeric-input .numeric-input-horiz .scroll-horiz .horiz-container .active {
+    background-color: #688;
+}
+
+.benome .interval-handles .interval-modify-handle {
+    position: absolute;
+    width: 4em;
+    height: 1.25em;
+    background-color: #448;
+    color: #aaa;
+    border-radius: 0.25em;
+    text-align: center;
+
+    cursor: pointer;
+
+    z-index: 1000000005;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+
+    top: 15%;
+    pointer-events: auto;
+}
+
+.benome .interval-handles .interval-modify-line {
+    position: absolute;
+    height: 0.25em;
+    background-color: blue;
+}
+
+.benome .exclusive {
+    background-color: black !important;
+}
+
+.benome .boolean-mode-view {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    /* border-radius: 1em; */
+}
+
+.benome .global-mode-exclusive {
+    overflow: hidden;
+}
+
+.benome .avail-balance {
+    position: absolute;
+    width: 4em;
+    right: 3%;
+    bottom: 3%;
+    text-align: right;
+    height: 1.15em;
+    color: orange;
+    font-size: 1.5em;
+    cursor: default;
+    pointer-events: none;
+}
+
+.benome .frequency-mode-edit .frequency-modify {
+    text-align: center;
+    height: 100%;
+    width: 100%;
+}
+
+.benome .frequency-mode-edit .frequency-modify .current-frequency {
+    width: 100%;
+    height: 1.25em;
+}
+
+.benome .frequency-mode-edit .frequency-modify .frequency-increase,
+.benome .frequency-mode-edit .frequency-modify .frequency-decrease {
+    pointer-events: auto;
+    width: 1.5em;
+    height: 1.5em;
+    margin: auto;
+    content: "";
+    z-index: -1;
+    background-size: cover;
+    background-repeat: no-repeat;
+
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+
+.benome .frequency-mode-edit .frequency-modify .frequency-decrease {
+    background-image: url(/static/images/right.png);
+}
+
+.benome .frequency-mode-edit .frequency-modify .frequency-increase {
+    background-image: url(/static/images/left.png);
+}
+
+.benome .activity-path-container {
+    background-color: transparent;
+}
+
+.benome .global-mode-view {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.benome .global-mode-view .label {
+    margin-top: -0.4em;
+}

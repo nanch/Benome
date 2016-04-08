@@ -1,0 +1,107 @@
+<html>
+<head>
+    <title>Daily Schedule</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="initial-scale=1.0, width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+    body {
+		background-color: black;
+		color: #888;
+		margin: 0;
+		padding: 0;
+	}
+
+	#stream-graph {
+		position: absolute;
+		width: 80%;
+		height: 150px;
+	}
+
+	#overview {
+		position: absolute;
+		width: 20%;
+		left: 80%;
+		height: 150px;
+		background-color: #111;
+	}
+
+	#segment-container {
+		position: absolute;
+		top: 150px;
+		width: 80%;
+		z-index: 10;
+		opacity: 0.8;
+		padding: 1em;
+
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+	}
+
+	.segment {
+		border: 2px solid #333;
+		border-radius: ;
+		background-color: #111;
+		margin-bottom: 0.5em;
+	}
+
+	.segment-header {
+		padding: 0.1em;
+		font-weight: bold;
+		background-color: #222
+	}
+
+	.options {
+		width: 100%;
+	}
+
+	.option-details {
+		width: 100%;
+		padding: 0.25em;
+
+	}
+
+	.active {
+		border-color: orange;
+	}
+    </style>
+    <script src="/static/js/d3.min.js"></script>
+    <script src="/static/js/bundle_daily.js"></script>
+
+</head>
+<body>
+	<div id="stream-graph"></div>
+	<div id="overview">
+		<div class="today-coverage-rel">
+			RelCoverage: <span></span>%
+		</div>
+		<div class="today-coverage-abs">
+			AbsCoverage: <span></span>%
+		</div>
+		<div class="today-contain">
+			Contain: <span></span>%
+		</div>
+		<div class="hours-today">
+			Today: <span></span>h
+		</div>
+		<div class="hours-week">
+			This week: <span></span>h
+		</div>
+		<div class="hours-lastweek">
+			Last week: <span></span>h
+		</div>
+		<div class="hours-month">
+			Month: <span></span>h
+		</div>
+		<div class="hours-new">
+			New: <span></span>h
+		</div>
+		<!-- <div class=""></div>
+		<div class=""></div> -->
+	</div>
+
+	<div id="segment-container"></div>
+</body>
+</html>
