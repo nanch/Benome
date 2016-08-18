@@ -17,12 +17,14 @@ git clone https://bitbucket.org/shazel/benome.git
 #### Install the various NPM modules
 
 *In benome/client/*
+
 npm install backbone hammerjs jquery jquery.mousewheel jquery.event.drag d3
 cd node_modules
 ln -s ../js app
 cd ..
 
 *In benome/client/build*
+
 npm install gulp gulp-util gulp-sourcemaps gulp-uglify vinyl-source-stream vinyl-buffer watchify browserify lodash
 
 ### Build
