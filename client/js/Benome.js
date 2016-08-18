@@ -59,6 +59,12 @@ var Benome = Backbone.View.extend({
     clusterRefreshInterval: 5 * 60 * 1000, // every 5 minutes
     defaultBackgroundColor: '#000',
 
+    isMobile: ('ontouchstart' in document.documentElement),
+    isAndroid: (/android/i.test(navigator.userAgent)),
+    isApple: (/iphone|ipod|ipad/i.test(navigator.userAgent)),
+    isMac: (/Macintosh/.test(navigator.userAgent)),
+    isTablet: (/ipad/i.test(navigator.userAgent) || ((/android/i.test(navigator.userAgent)) && !(/mobile/i.test(navigator.userAgent)))),
+
     initialize: function(options) {
         options = options || {};
         this.G = this.G || options.G || require('app/Global')();
@@ -140,10 +146,11 @@ var Benome = Backbone.View.extend({
 
         this.defaultGlobalClusterOptions = {
             dropDisabled: false,
-            radiusScaleFactor: 0.35,
             noCompress: false,
-            newContextBumpTime: 0,
-            setBackgroundFilterLevel: true
+            newContextBumpTime: 20,
+            setBackgroundFilterLevel: options.setBackgroundFilterLevel,
+            radiusScaleFactor: this.isMobile ? 0.50 : 0.35,
+            fontFraction: this.isMobile ? 0.27 : 0.22
         }
 
         this.globalClusterOptions = _.extend({}, this.defaultGlobalClusterOptions, options.globalClusterOptions || {});
@@ -152,6 +159,7 @@ var Benome = Backbone.View.extend({
             $el: this.$container,
             bgColor: options.bgColor || this.defaultBackgroundColor,
             enabledApps: options.enabledApps || null,
+            features: options.features || {},
             globalAppOnly: options.globalAppOnly,
             graphEnabled: false,
             timeOffset: options.timeOffset || 0,
@@ -163,7 +171,7 @@ var Benome = Backbone.View.extend({
             minLightness: 0.15,
             autoActionDelay: this.autoActionDelay,
             localOnly: this.localOnly,
-            visualQuality: _.isNumber(options.visualQuality) ? options.visualQuality : (this.isMobile ? 0.0 : 1.0),
+            visualQuality: _.isNumber(options.visualQuality) ? options.visualQuality : (this.G.isMobile ? 0.0 : 1.0),
             targetDataFilter: 8, // This will be dynamic
             idleThreshold: options.idleThreshold || this.idleThreshold,
             idleMax: 180 * 1000,
@@ -190,7 +198,7 @@ var Benome = Backbone.View.extend({
 
         this.$timelineContainer = $('.timeline-container', this.$container);
 
-        if (!options.timelineDisabled) {
+        if (!options.timelineDisabled && this.G.FEATURE('ActionTimeline')) {
             if (!this.continuousTiming) {
                 this.timelineView = new TimelineView({
                     el: this.$timelineContainer,

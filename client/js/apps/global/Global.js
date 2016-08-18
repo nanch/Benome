@@ -122,7 +122,7 @@ _.extend(GlobalApp.prototype, {
 		};
 
 		var graphWindow = options.graphWindow || (3 * 86400),
-			numSegments = Math.min(80, options.numSegments || 20),
+			numSegments = Math.max(10, Math.min(1000, options.numSegments || 20)),
 			maxDepth = Math.min(3, options.maxDepth || 1),
 			initialDepth = context.getDepth(),
 			aggregateContexts = {};
@@ -159,7 +159,7 @@ _.extend(GlobalApp.prototype, {
 				// Sum the level components
 				return {
 					'LayerID': levelContext.id,
-					'Color': levelContext.getColor(null, 0.5),
+					'Color': levelContext.getColor(null, options.colorFade || 0.5),
 					'NumLayers': levelData.length,
 					'Data': this.G.sumArrays(levelData)
 				}
@@ -252,7 +252,7 @@ _.extend(GlobalApp.prototype, {
 				var numDays = 7;
 				_.extend(graphOptions, {
 					graphWindow: numDays * 86400,
-					numSegments: numDays * 5,
+					numSegments: numDays * 10,
 					numLabels: numDays
 				});
                 graphWidth = graphWidth || regionHeight;
@@ -303,8 +303,10 @@ _.extend(GlobalApp.prototype, {
 		            	G: G,
 		            	labels: true,
 		            	labelFunc: function(rawTotal, total, numSegments, layers, segmentIdx, layerData) {
-		            		var numLayers = G.sum(_.pluck(layers, 'NumLayers'));
-		            		return parseInt(total / numLayers);
+		            		return 0;
+
+		            		/*var numLayers = G.sum(_.pluck(layers, 'NumLayers'));
+		            		return parseInt(total / numLayers);*/
 		            	}
 		            });
 		        }

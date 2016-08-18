@@ -298,55 +298,64 @@ _.extend(BaseClusterController.prototype, {
             contextID = view.viewID,
             contextModel = this.cluster.contexts.get(contextID);
 
-        var clusterDef = this.G.generateContextAttributeCluster(contextModel);
-
         var initialPos = {
             x: dropDetails.currentX,
             y: dropDetails.currentY
         };
-        clusterDef.RenderOptions.initialPos = initialPos;
-        clusterDef.Options.radiusScaleFactor = 0.4;
 
-        var color = this.cluster.getColor(contextID);
-        clusterDef.Options.rootColor = color;
-        clusterDef.Origin = null;
+        if (this.G.FEATURE('ClusteredEdit')) {
+            var clusterDef = this.G.generateContextAttributeCluster(contextModel);
+            clusterDef.RenderOptions.initialPos = initialPos;
+            clusterDef.Options.radiusScaleFactor = 0.4;
 
-        var _this = this;
-        this.pushCluster({
-            originalView: view,
-            clusterDef: clusterDef,
-            visibleUIElements: clusterDef.Options.visibleUIElements,
-            contextModel: contextModel,
-            contextID: contextID,
-            initialPos: initialPos,
-            initValues: function(clusterDef, options) {
-                var context = options.contextModel;
-                return {
-                    'Label': context.getNS('Label'),
-                    'TargetFrequency': context.getNS('TargetFrequency'),
-                    'BaseValue': context.getNS('BaseValue', 2001) || 10
-                }
-            },
-            commit: function(options) {
-                var values = options.values,
-                    context = options.contextModel;
+            var color = this.cluster.getColor(contextID);
+            clusterDef.Options.rootColor = color;
+            clusterDef.Origin = null;
 
-                if (context) {
-                    var updateAttributes = values,
-                        eventHandlers = options.clusterDef && options.clusterDef.EventHandlers;
-
-                    if (_.isFunction(eventHandlers.onCommit)) {
-                        updateAttributes = eventHandlers.onCommit(updateAttributes, context, options);
+            var _this = this;
+            this.pushCluster({
+                originalView: view,
+                clusterDef: clusterDef,
+                visibleUIElements: clusterDef.Options.visibleUIElements,
+                contextModel: contextModel,
+                contextID: contextID,
+                initialPos: initialPos,
+                initValues: function(clusterDef, options) {
+                    var context = options.contextModel;
+                    return {
+                        'Label': context.getNS('Label'),
+                        'TargetFrequency': context.getNS('TargetFrequency'),
+                        'BaseValue': context.getNS('BaseValue', 2001) || 10
                     }
+                },
+                commit: function(options) {
+                    var values = options.values,
+                        context = options.contextModel;
 
-                    if (_.keys(updateAttributes).length > 0) {
-                        _this.G.trigger('UpdateContext', context.id, updateAttributes);
+                    if (context) {
+                        var updateAttributes = values,
+                            eventHandlers = options.clusterDef && options.clusterDef.EventHandlers;
+
+                        if (_.isFunction(eventHandlers.onCommit)) {
+                            updateAttributes = eventHandlers.onCommit(updateAttributes, context, options);
+                        }
+
+                        if (_.keys(updateAttributes).length > 0) {
+                            _this.G.trigger('UpdateContext', context.id, updateAttributes);
+                        }
                     }
+                },
+                complete: function() {
                 }
-            },
-            complete: function() {
-            }
-        });
+            });
+        }
+        else {
+            this.G.trigger('ShowContextRename', view, {
+                autoFocus: true,
+                autoHide: false,
+                renameContextID: contextID
+            });
+        }
     },
 
     addNode: function(nodeDef, parentID, contextCollection) {

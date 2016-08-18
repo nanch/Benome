@@ -147,8 +147,12 @@ _.extend(GraphVisual.prototype, {
         var symLayers = layers.slice().reverse();
         symLayers = symLayers.concat(layers);
 
-        var svgEl = this.renderStreamGraphSVG(width, height, numSegments, symLayers, graphOptions),
-            serializer = new XMLSerializer(),
+        var svgEl = this.renderStreamGraphSVG(width, height, numSegments, symLayers, graphOptions);
+        
+        // Anti-aliasing disabled to eliminate light edges on interior paths
+        //svgEl.setAttribute('shape-rendering', 'crispEdges');
+
+        var serializer = new XMLSerializer(),
             svgStr = serializer.serializeToString(svgEl),
             svgDataUrl = 'data:image/svg+xml;base64,' + window.btoa(svgStr);
 
@@ -181,6 +185,12 @@ _.extend(GraphVisual.prototype, {
             this.$svgContainer = $('<div>').hide().appendTo('body');
         }
         this.$svgContainer.empty();
+
+        // FIXME: Temporarily force max Y value into last column to ensure absolute scaling
+        _.each(layers, function(layer) {
+            layer.Data[layer.Data.length - 1] = layer.NumLayers * 100;
+        });
+
         var stack = d3.layout.stack().offset('silhouette'),
             layers0 = stack(layers.map(function(d) {
                     return formatLayer(d);
@@ -205,9 +215,15 @@ _.extend(GraphVisual.prototype, {
             .range([height, 0]);
 
         var area = d3.svg.area()
-            .x(function(d) { return x(d.x); })
-            .y0(function(d) { return y(d.y0); })
-            .y1(function(d) { return y(d.y0 + d.y); });
+            .x(function(d) {
+                return x(d.x);
+            })
+            .y0(function(d) {
+                return y(d.y0);
+            })
+            .y1(function(d) {
+                return y(d.y0 + d.y);
+            });
 
         var svg = d3.select(this.$svgContainer.get()[0]).append('svg')
                     .attr('width', width)

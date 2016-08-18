@@ -23,20 +23,19 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     moment = require('app/lib/moment');
 
-
 // -------------
-var Colors = require('app/Colors');
 
-function Cluster(clusterID, controller, options) {
-    this.G = this.G || options.G || require('app/Global')();
+var Colors = require('app/modules/Util/Colors'),
+    SimpleView = require('app/modules/Views/SimpleView'),
+    GraphSurfaceView = require('app/modules/GraphSurfaceView');
 
+function Cluster(clusterID, contexts, options, config) {
     this.clusterID = clusterID;
-    this.controller = controller;
 
     _.bindAll(this, 'dataChanged', 'dataAdded', 'dataCleared', 'render');
     this.dataChanged = _.debounce(this.dataChanged, 50);
 
-    this.initCollection(controller.getContextCollection());
+    this.initCollection(contexts);
 
     this.defaultConfig = {
         scaleFactor: 0.7,
@@ -53,8 +52,7 @@ function Cluster(clusterID, controller, options) {
         focusFontSize: 1.3,
         fadeDepth: 3,
         fadeFactor: 0.25,
-        /*fontFraction: this.G.mobileFont ? 0.33 : 0.22,
-        fontSizeProportion: this.G.mobileFont ? 0.08 : 0.05,*/
+        fadeTarget: options.baseBGColor || '#fff',
         fontFraction: 0.22,
         fontSizeProportion: 0.05,
         hideSmallText: true,
@@ -72,7 +70,12 @@ function Cluster(clusterID, controller, options) {
         moveDisabled: false,
         showDetailIndicator: true,
         setBackgroundFilterLevel: true,
-        visualQuality: this.G.visualQuality || 0 // 0 to 1
+        visualQuality: options.visualQuality || 0, // 0 to 1
+        allowRootOnly: false,
+        filterType: 'cutoff',
+        filterOptions: {
+            cutoffValue: 0.2
+        }
     }
 
     this.state = {};
@@ -80,19 +83,23 @@ function Cluster(clusterID, controller, options) {
     this.focusData = {};
     this.viewStates = {};
 
-    this.setConfig(this.controller.getConfig());
+    this.setConfig(config);
 
     this.listeners = options.listeners || {};
     this.$container = options.$el;
     this.filterLevel = options.filterLevel || 0;
+    this.minLightness = options.minLightness;
+    this.baseBGColor = options.baseBGColor || '#fff';
+    this.fontSize = options.fontSize;
+    this.globalRootContextID = options.globalRootContextID;
     this.debounceRender = _.debounce(this.render, 250);
 
     var rootID = this.contexts.rootID,
         focusID = options.focusID || rootID;
 
-    this.colors = new Colors(this, {
+    this.colors = new Colors(this.contexts, {
         rootContextID: rootID,
-        minLightness: this.G.minLightness
+        minLightness: this.minLightness
     });
 
     this.defaultNodeAppearance = {
@@ -156,21 +163,28 @@ _.extend(Cluster.prototype, {
         //console.log('creatordrop', dropView, dragView, dragDetails, dropDetails);
     },
 
-    getColor: function(contextID, fresh, baseLightnessAdjust) {
-        return this.nodeAppearance.getColor(contextID, fresh, baseLightnessAdjust);
+    getColor: function(contextID, fresh, baseLightnessAdjust, noCache) {
+        return this.nodeAppearance.getColor(contextID, fresh, baseLightnessAdjust, noCache);
     },
 
     getFontSize: function() {
         // TODO: per-cluster sizing with global reference or default
-        return this.G.fontSize;
+        return this.fontSize;
+    },
+
+    setFontSize: function(fontSize) {
+        this.fontSize = fontSize
+    },
+
+    setZIndex: function(zIndex) {
+        this.currentZIndex = zIndex;
     },
 
     setFocus: function(newFocusID, render) {
         newFocusID = newFocusID || this.focusID;
 
         if (this.renderedOnce && newFocusID != this.focusID) {
-            this.G.trigger('BeforeFocusChanged', this, newFocusID);
-            this.trigger('BeforeFocusChanged', this, newFocusID);
+            this.trigger('BeforeFocusChanged', this, newFocusID, this.contexts.get(newFocusID), this.focusID, this.contexts.get(this.focusID));
         }
 
         this.lastFocusID = this.focusID || this.rootID;
@@ -209,6 +223,48 @@ _.extend(Cluster.prototype, {
         else {
             this.focusRadius = radius;
         }
+    },
+
+    getSurfaceView: function(neighbourID, neighbourState) {
+        var neighbourView = this.getView(neighbourID),
+            neighbourContext = this.contexts.get(neighbourID);
+
+        var surfaceView = this.surfaceViewFunc(neighbourID, neighbourState, neighbourView, neighbourContext);
+        surfaceView.setDisplayMode('View');
+
+        return surfaceView;
+    },
+
+    getSurfaceViewClass: function(contextModel) {
+        return GraphSurfaceView;
+    },
+
+    surfaceViewFunc: function(viewID, viewState, baseView, contextModel) {
+        this.surfaceViewCache = this.surfaceViewCache || {};
+
+        var view = this.surfaceViewCache[viewID];
+        if (!view) {
+            var SurfaceViewCls = this.getSurfaceViewClass(contextModel);
+            view = new SurfaceViewCls({
+                //G: this.G,
+                viewState: viewState,
+                baseView: baseView,
+                contextModel: contextModel,
+                //clusterController: this,
+                //modeParams: this.getModeParams(contextModel)
+            });
+            //this.listenTo(view, 'ValueChanged', this.onValueChange);
+        }
+        else {
+            view.setState(viewState);
+        }
+
+        this.surfaceViewCache[viewID] = view;
+        return view;
+    },
+
+    checkAnimEnabled: function(numElements) {
+        return true;
     },
 
     normalizeAngle: function(angle) {
@@ -281,6 +337,14 @@ _.extend(Cluster.prototype, {
         return this.focusRadius;
     },
 
+    getElementView: function(contextID, isRoot, isGlobalRoot, options) {
+        if (this.elementViewFunc) {
+            return this.elementViewFunc(contextID, isRoot, isGlobalRoot, options);
+        }
+
+        return SimpleView;
+    },
+
     getView: function(contextID, isRoot, isGlobalRoot, options, renderOptions) {
         contextID = contextID - 0;
         
@@ -289,7 +353,7 @@ _.extend(Cluster.prototype, {
 
         var view = this.viewCache[contextID];
         if (!view && !options.noCreate) {
-            var ElementCls = this.controller.getElementView(contextID, isRoot, isGlobalRoot, options),
+            var ElementCls = this.getElementView(contextID, isRoot, isGlobalRoot, options),
                 viewState = this.getViewState(contextID),
                 dropDisabled = this.config.dropDisabled,
                 dragDisabled = this.config.dragDisabled;
@@ -311,7 +375,6 @@ _.extend(Cluster.prototype, {
             }
             
             view = new ElementCls({
-                G: this.G,
                 model: this.contexts.get(contextID),
                 viewID: contextID,
                 isRoot: isRoot,
@@ -322,7 +385,6 @@ _.extend(Cluster.prototype, {
                 labelIDOnly: this.config.labelIDsOnly,
                 color: color,
                 visualQuality: this.config.visualQuality,
-                data: this.G.getItemData(contextID),
                 dropDisabled: dropDisabled,
                 dragDisabled: dragDisabled,
                 moveDisabled: this.config.moveDisabled
@@ -424,8 +486,6 @@ _.extend(Cluster.prototype, {
     setFilterLevel: function(filterLevel, options) {
         options = options || {};
         var isRelative = options.relative || false,
-            baseBGColor = $.Color(this.G.bgColor),
-            bgColor = baseBGColor,
             newFilterLevel;
 
         if (isRelative) {
@@ -440,25 +500,7 @@ _.extend(Cluster.prototype, {
             this.lastFilterLevel = this.filterLevel;
             this.filterLevel = newFilterLevel;
 
-            this.G.trigger('FilterLevelChanged', newFilterLevel);
-
-            if (this.config.setBackgroundFilterLevel) {
-                var transitionDistance = newFilterLevel / this.config.numDetailLevels;
-                bgColor = baseBGColor.transition($.Color('#888'), transitionDistance);
-
-                this.G.setBackgroundColor(filterColor.toHexString());
-
-                // 
-
-                /*neighbourColor = neighbourColor.transition(black, neighbourViewState.colorFade);
-
-                baseGrayscale = newFilterLevel == 0 ? 0 : 16,
-                    greyScale = baseGrayscale + (8 * newFilterLevel);
-
-                this.$container.css({
-                    'background-color': 'rgba(100, 100, 100, ' + (greyScale / 256) + ')'
-                });*/
-            }
+            this.trigger('FilterLevelChanged', newFilterLevel);
 
             if (!options.noRender) {
                 this.render(options);
@@ -471,32 +513,40 @@ _.extend(Cluster.prototype, {
 
         var focusID = options.focusID || this.focusID || this.rootID,
             numLevels = options.numLevels || this.config.numDetailLevels,
-            byDistribution = options.byDistribution || false,
-            lowestLevelSize = options.lowestLevelSize || 5;
+            filterType = this.config.filterType,
+            filterOptions = this.config.filterOptions,
+            lowestLevelSize = options.lowestLevelSize || 5,
+            levelBounds = [0];
 
         if (!options.noCalc) {
             // Get the latest scores
             this.contexts.traverseGraph(focusID);
         }
 
-        var scores = this.contexts.map(function(context) {
-            return context.getDistanceScore();
-        });
+        var scores = this.contexts.chain()
+                                        .filter(function(context) {
+                                            return context.isLeaf();
+                                        })
+                                        .map(function(context) {
+                                            return context.getDistanceScore();
+                                        })
+                                    .values();
+
         scores.sort(function (a, b) { return a - b; });
 
-        if (!byDistribution) {
+        if (filterType == 'intervals') {
             // Detail levels based on score intervals
             var lowestDetailScore = _.max(_.last(scores, lowestLevelSize)), // Larger
                 highestDetailScore = _.min(scores), // Smaller
                 scoreRange = lowestDetailScore - highestDetailScore,
                 boundIncr = scoreRange / (numLevels - 1);
 
-            var levelBounds = _.map(_.range(0, numLevels - 1), function(level) {
+            levelBounds = _.map(_.range(0, numLevels - 1), function(level) {
                 return highestDetailScore + (boundIncr * level);
             });
             levelBounds.push(lowestDetailScore);
         }
-        else {
+        else if (filterType == 'distribution') {
             // Detail levels based on a functional distribution
             //  Linear to start with
 
@@ -516,7 +566,7 @@ _.extend(Cluster.prototype, {
                 incr = numFunctionalScores / (numLevels - 1),
                 lastIdx = 0;
 
-            var levelBounds = _.map(_.range(1, numLevels - 1), function(level) {
+            levelBounds = _.map(_.range(1, numLevels - 1), function(level) {
                 var idx = Math.floor(level * incr),
                     levelBound = tScores[idx];
 
@@ -526,6 +576,13 @@ _.extend(Cluster.prototype, {
 
             levelBounds.unshift(0);
             levelBounds.push(tScores[Math.floor(lastIdx + incr)]);
+        }
+        else if (filterType == 'cutoff') {
+            var cutoffValue = filterOptions.cutoffValue || 0.2;
+            levelBounds = _.map(_.range(0, numLevels - 1), function(level) {
+                return cutoffValue;
+            });
+            levelBounds.unshift(0);
         }
 
         return levelBounds;
@@ -537,9 +594,25 @@ _.extend(Cluster.prototype, {
         });
     },
 
+    destroyViews: function() {
+        _.each(this.viewCache, function(view) {
+            view.$el.hide();
+            view.$el.remove();
+        });
+
+        this.viewCache = {};
+    },
+
     render: function(options) {
         options = options || {};
         var beginTime = Date.now();
+
+        _.isNumber(options.filterLevel) && this.setFilterLevel(options.filterLevel, {noRender: true});
+        options.radius && this.setRadius(options.radius);
+        options.initialZIndex && this.setZIndex(options.initialZIndex);
+        options.position && this.setPosition(options.position.x, options.position.y);
+        options.fontSize && this.setFontSize(options.fontSize);
+        options.config && this.setConfig(options.config);
 
         if (!this.sortOrder) {
             this.computeSortOrder();
@@ -553,13 +626,14 @@ _.extend(Cluster.prototype, {
         var levelBounds = this.calcDetailLevels({
                                                     focusID: focusID,
                                                     noCalc: true,
-                                                    byDistribution: true,
+                                                    filterType: options.filterType,
+                                                    filterOptions: options.filterOptions,
                                                     lowestLevelSize: 5
                                                 }),
             filterValue = levelBounds[this.filterLevel];
 
         if (this.lastFilterValue != filterValue || this.filterLevel != this.lastFilterLevel) {
-            this.G.trigger('ClusterFilterValueChanged', this, filterValue);
+            this.trigger('ClusterFilterValueChanged', this, filterValue);
             this.lastFilterValue = filterValue;
         }
         
@@ -570,19 +644,14 @@ _.extend(Cluster.prototype, {
         }
 
         var zIndex = this.currentZIndex;
-
-        if (!options.keepZIndex) {
-            zIndex = this.G.getClusterZIndex(this.clusterID);
-        }
-
         options.zIndex = zIndex;
-        this.currentZIndex = zIndex;
 
         var layoutData = this.computeLayoutData(filteredData, focusID, options, this.lastLayoutData),
             layoutIDs = _.map(_.keys(layoutData.data), function(x) { return x -= 0; });
 
-        if (layoutIDs.length == 1 && !this.config.hideChildren) {
+        if (layoutIDs.length == 1 && !this.config.hideChildren && !this.config.allowRootOnly) {
             var nextOptions = _.extend({}, options);
+            delete nextOptions.filterLevel;
             if (layoutIDs[0] != this.rootID) {
                 var focusContext = this.contexts.get(layoutIDs[0]);
                 if (focusContext) {
@@ -599,11 +668,7 @@ _.extend(Cluster.prototype, {
         }
 
         this.focusID = layoutData.focusID;
-
-        if (this.G.isGlobalCluster(this)) {
-            this.G.localSet('LastFocus', this.focusID);
-        }
-        
+        this.trigger('FocusChanged', this, this.focusID, this.contexts.get(this.focusID), this.lastFocusID, this.contexts.get(this.lastFocusID));
         this.lastLayoutData = layoutData;
 
         if (this.lastData) {
@@ -632,14 +697,19 @@ _.extend(Cluster.prototype, {
             rootTrace = [];
 
         while (parentID) {
-            parentID = this.contexts.get(parentID).getParentID();
+            var context = this.contexts.get(parentID);
+            if (!context) {
+                break;
+            }
+
+            parentID = context.getParentID();
             if (parentID) {
                 rootTrace.push(parentID);
             }
         }
 
         if (options.noAnimate !== false && options.noAnimate !== true) {
-            options.noAnimate = !this.G.checkAnimEnabled(layoutIDs.length);
+            options.noAnimate = !this.checkAnimEnabled(layoutIDs.length);
         }
 
         //console.log('Cluster compute', Date.now() - beginTime);
@@ -715,15 +785,15 @@ _.extend(Cluster.prototype, {
 
         this.renderedOnce = true;
 
-        this.G.trigger('AfterClusterRender', this);
+        this.trigger('AfterClusterRender', this);
 
         if (options.noAnimate) {
-            this.G.trigger('AfterClusterAnim', this);
+            this.trigger('AfterClusterAnim', this);
         }
         else {
             var _this = this;
             _.delay(function() {
-                _this.G.trigger('AfterClusterAnim', _this);
+                _this.trigger('AfterClusterAnim', _this);
             }, (options.animateDuration || this.config.animateDuration) + 20);
         }
 
@@ -1094,7 +1164,7 @@ _.extend(Cluster.prototype, {
             neighbours = currentState.neighbours,
             isFocus = currentID == layoutData.focusID,
             isRoot = currentID == this.rootID,
-            isGlobalRoot = currentID == this.G.rootContextID,
+            isGlobalRoot = currentID == this.globalRootContextID,
             baseView = this.getView(currentID, isRoot, isGlobalRoot, null, options);
 
         if (!currentState.visible) { 
@@ -1122,7 +1192,7 @@ _.extend(Cluster.prototype, {
                 baseView.setFontSize(currentState.fontSize[0], currentState.fontSize[1], true);
                 baseView.setVisualQuality(config.visualQuality);
 
-                var surfaceView = this.controller.getSurfaceView(currentID, currentState, baseView, this.contexts.get(currentID));
+                var surfaceView = this.getSurfaceView(currentID, currentState);
                 baseView.addSurfaceView('test', surfaceView);
                 baseView.setActiveSurfaceView('test', {
                     render: false
@@ -1178,7 +1248,10 @@ _.extend(Cluster.prototype, {
 
                 neighbourView.show();
 
-                if (!options.forceRender && neighbourState.x == neighbourView.x && neighbourState.y == neighbourView.y && neighbourView.radius == neighbourState.radius) {
+                if (!options.forceRender && neighbourState.x == neighbourView.x
+                        && neighbourState.y == neighbourView.y
+                        && neighbourView.radius == neighbourState.radius
+                        && !baseView.surfaceView.dataReactive(neighbourID)) {
                     // Simplify
                     if (neighbourState.zIndex != neighbourView.zIndex) {
                         neighbourView.setZIndex(neighbourState.zIndex);
@@ -1200,30 +1273,32 @@ _.extend(Cluster.prototype, {
                     neighbourView.setFontSize(neighbourState.fontSize[0], neighbourState.fontSize[1], true);
                     neighbourView.setVisualQuality(config.visualQuality);
 
-                    var neighbourColor = null,
-                        black = $.Color('#000');
-                    if (neighbourState.depth >= config.fadeDepth) {
-                        var fadeAmount = (((neighbourState.depth - config.fadeDepth) + 1) * config.fadeFactor),
-                            originalColor = $.Color(neighbourView.getColor());
+                    var colorTransition = null,
+                        fadeTarget = $.Color(config.fadeTarget);
 
-                        neighbourColor = originalColor.transition(black, Math.min(0.85, fadeAmount));
+                    if (neighbourState.depth >= config.fadeDepth) {
+                        var fadeAmount = (((neighbourState.depth - config.fadeDepth) + 1) * config.fadeFactor);
+                        colorTransition = {
+                            target: fadeTarget,
+                            distance: Math.min(0.85, fadeAmount)
+                        }
                     }
 
-                    var surfaceView = this.controller.getSurfaceView(neighbourID, neighbourState, neighbourView, this.contexts.get(neighbourID));
+                    var surfaceView = this.getSurfaceView(neighbourID, neighbourState);
                     neighbourView.addSurfaceView('test', surfaceView);
                     neighbourView.setActiveSurfaceView('test', {
                         render: false
                     });
 
                     if (neighbourViewState.colorFade) {
-                        if (!neighbourColor) {
-                            neighbourColor = $.Color(neighbourView.getColor());
+                        colorTransition = {
+                            target: fadeTarget,
+                            distance: neighbourViewState.colorFade
                         }
-                        neighbourColor = neighbourColor.transition(black, neighbourViewState.colorFade);
                     }
 
                     neighbourView.render({
-                        color: neighbourColor,
+                        colorTransition: colorTransition,
                         graphWidth: (this.getFocusRadius() / Math.pow(2, 0.5) * 2) * 0.8,
                         graphHeight: (this.getFocusRadius() / Math.pow(2, 0.5) * 2) * 0.5,
                         renderSurface: options.renderSurfaces,

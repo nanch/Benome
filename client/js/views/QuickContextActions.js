@@ -42,6 +42,8 @@ var QuickContextActions = Backbone.View.extend({
         this.$overlay.click(this.hide);
         this.$label = $('input', this.$el);
         this.$label.bind('keydown', this.labelKeydown);
+
+        this.G.on('GlobalClusterClicked', this.hide);
     },
 
     labelKeydown: function(e) {
@@ -93,6 +95,7 @@ var QuickContextActions = Backbone.View.extend({
         options = options || {};
 
         this.isActive = false;
+        var lastVisible = this.isVisible;
         this.isVisible = true;
 
         var $refEl = refView.$el,
@@ -126,14 +129,26 @@ var QuickContextActions = Backbone.View.extend({
         if (options.autoHide) {
             _.delay(this.hide2, options.autoHide, this.randNum);
         }
-        this.$el
-            .css({
-                opacity: 0
-            })
-            .show()
-            .animate({
-                opacity: 0.9
-            }, {duration: 150});
+
+        this.lastPointerEventsVal = null;
+        if (!lastVisible) {
+            this.$el
+                .css({
+                    opacity: 0,
+                    'pointer-events': 'auto'
+                })
+                .show()
+                .animate({
+                    opacity: 0.9
+                }, {duration: 150});
+        }
+        else {
+            this.$el
+                .css({
+                    opacity: 1,
+                    'pointer-events': 'auto'
+                });
+        }
     },
 
     hide2: function(randNum) {
@@ -179,7 +194,7 @@ var QuickContextActions = Backbone.View.extend({
         }
     },
 
-    restorePointer: function() {
+    restorePointer: function(force) {
         if (this.lastPointerEventsVal) {
             this.$el.css({
                 'pointer-events': this.lastPointerEventsVal,

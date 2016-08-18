@@ -353,8 +353,10 @@ var SimpleView = ElementView.extend({
 
         if (targetView === this && ($target.hasClass('simple-view') || $target.hasClass('focus-container'))) {
             if (this.numPressIntervals >= 7) {
-                this.G.trigger('ActivityPressed', e, this);
-                this.cluster.trigger('ActivityPressed', e, this);
+                if (this.G.FEATURE('PointLongPress')) {
+                    this.G.trigger('ActivityPressed', e, this);
+                    this.cluster.trigger('ActivityPressed', e, this);
+                }
             }
             else {
                 if (this.G.FEATURE('PointShortPress')) {

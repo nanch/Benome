@@ -1137,7 +1137,8 @@ body {
 }
 
 .benome .admin-view .button {
-    width: 4em;
+    padding: 0.2em;
+
     margin: 1%;
     font-size: 1em;
     cursor: pointer;
@@ -1155,7 +1156,7 @@ body {
     border-radius: 0.25em;
 }
 
-.benome .admin-view .toggle-fullscreen {
+.benome .admin-view .toggle-fullscreen, .benome .admin-view .export-complete {
     width: 6em;
 }
 
@@ -1263,7 +1264,7 @@ body {
 }
 
 .benome .drop-highlight {
-    box-shadow: 0px 0px 0.75em 0.5em orange, inset 0px 0px 0.6em 0.1em blue !important;
+    box-shadow: 0px 0px 3.75em 1.5em orange, inset 0px 0px 1.6em 0.2em blue !important;
 }
 
 .benome .highlight {

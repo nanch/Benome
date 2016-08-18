@@ -28,7 +28,7 @@ var watchify = require('watchify');
 var browserify = require('browserify');
 var _ = require('lodash');
 
-gulp.task('js', function() {
+gulp.task('prod', function() {
   var bundler = browserify({
     entries: ['../js/Entry.js'],
     debug: true
@@ -70,91 +70,5 @@ function bundle() {
 
     .pipe(gulp.dest('./deploy/js'));
 }
-gulp.task('jsdev', bundle);
+gulp.task('dev', bundle);
 devBundler.on('update', bundle); // on any dep update, runs the bundler
-
-gulp.task('jsdev_daily', function() {
-  var bundler = browserify({
-    entries: ['../js/DailyEntry.js'],
-    debug: true
-  });
-
-  var bundle = function() {
-    return bundler
-      .bundle()
-      .pipe(source('bundle_daily.js'))
-      .pipe(buffer())
-      .pipe(sourcemaps.init({loadMaps: true}))
-      .pipe(sourcemaps.write('./'))
-      .pipe(gulp.dest('./deploy/js'));
-  };
-
-  var bundleResult = bundle();
-  gulp.src(['../index.html']).pipe(gulp.dest('./deploy'));
-  return bundleResult;
-});
-
-gulp.task('jsdev_numeric', function() {
-  var bundler = browserify({
-    entries: ['../js/NumericEntry.js'],
-    debug: true
-  });
-
-  var bundle = function() {
-    return bundler
-      .bundle()
-      .pipe(source('bundle_numeric.js'))
-      .pipe(buffer())
-      .pipe(sourcemaps.init({loadMaps: true}))
-      .pipe(sourcemaps.write('./'))
-      .pipe(gulp.dest('./deploy/js'));
-  };
-
-  var bundleResult = bundle();
-  gulp.src(['../index.html']).pipe(gulp.dest('./deploy'));
-  return bundleResult;
-});
-
-/*gulp.task('jsdev_demo', function() {
-  var bundler = browserify({
-    entries: ['../js/DemoEntry.js'],
-    debug: true
-  });
-
-  var bundle = function() {
-    return bundler
-      .bundle()
-      .pipe(source('bundle_demo.js'))
-      .pipe(buffer())
-      .pipe(sourcemaps.init({loadMaps: true}))
-      .pipe(sourcemaps.write('./'))
-      .pipe(gulp.dest('./deploy/js'));
-  };
-
-  var bundleResult = bundle();
-  gulp.src(['../index.html']).pipe(gulp.dest('./deploy'));
-  return bundleResult;
-});*/
-
-var devDemoBundler = watchify(browserify('../js/DemoEntry.js', watchify.args));
-function bundleDemo() {
-  return devDemoBundler.bundle()
-    // log errors if they happen
-    .on('error', function(error) {
-        //gutil.log.bind(gutil, 'Browserify Error'))
-        gutil.log('Browserify Error', error.toString());
-    })
-    .on('end', function() {
-      gutil.log('Compile finished', new Date());
-    })
-    .pipe(source('bundle_demo.js'))
-    
-    /*// optional, remove if you dont want sourcemaps
-      .pipe(buffer())
-      .pipe(sourcemaps.init({loadMaps: true})) // loads map from browserify file
-      .pipe(sourcemaps.write('./')) // writes .map file*/
-
-    .pipe(gulp.dest('./deploy/js'));
-}
-gulp.task('jsdev_demo', bundleDemo);
-devDemoBundler.on('update', bundleDemo); // on any dep update, runs the bundler

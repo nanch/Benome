@@ -45,8 +45,13 @@ _.extend(Global.prototype, {
         'DetailLevels': true,
         'MovableFocus': true,
         'PointShortPress': true,
+        'PointLongPress': true,
         'ActivityPullForward': true,
-        'ActivityPushBack': true
+        'ActivityPushBack': true,
+        'ActionHistory': true,
+        'ActionTimeline': true,
+        'ClusteredEdit': true,
+        'AddFeedbackInteractive': true
     },
 
     pointAttributeClusterDef: {
@@ -103,6 +108,10 @@ _.extend(Global.prototype, {
         this.$overlay = $('.overlay-backing', options.$el);
         this.$overlay2 = $('.ovzerlay-backing2', options.$el);
 
+        if (options.features) {
+            this.setFeatures(options.features);
+        }
+
         if (this.bgColor == 'dark') {
             this.bgColor = '#000';
         }
@@ -120,10 +129,10 @@ _.extend(Global.prototype, {
         }
         else {
             this.bgColor = this.bgColor || '#000';
-            this.$el.css({
-                'background-color': this.bgColor
-            });
+
         }
+
+        this.setBackgroundColor(this.bgColor)
 
         this.contextRename = new QuickContextActions({
             el: this.$qca,
@@ -257,6 +266,12 @@ _.extend(Global.prototype, {
         }, this);
     },
 
+    setBackgroundColor: function(bgColor) {
+        this.$el.css({
+            'background-color': bgColor
+        });
+    },
+
 	setFeatures: function(features) {
         _.extend(this.featureState, features);
         return this.featureState;
@@ -290,7 +305,8 @@ _.extend(Global.prototype, {
     },
 
     updateFontSize: function() {
-        this.fontSize = Math.max(10, ((this.$el.width() + this.$el.height()) / 2) / 40);
+        var scaleFactor = this.isMobile ? 30 : 40;
+        this.fontSize = Math.max(10, ((this.$el.width() + this.$el.height()) / 2) / scaleFactor);
         this.$el.css('font-size', this.fontSize + 'px');
     },
 

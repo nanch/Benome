@@ -96,6 +96,7 @@ _.extend(BenomeEntry.prototype, {
         var viewOptions = _.extend(options, {
             container: this.$container,
             defaultFilter: defaultFilter,
+            features: options.features,
             autoActionDelay: autoActionDelay,
             visualQuality: visualQuality,
             bgColor: backgroundColor,
@@ -106,7 +107,8 @@ _.extend(BenomeEntry.prototype, {
             hideLabels: hideLabels,
             enabledApps: options.enabledApps,
             continuousTiming: options.continuousTiming,
-            clusterFilterShift: clusterFilterShift
+            clusterFilterShift: clusterFilterShift,
+            setBackgroundFilterLevel: options.setBackgroundFilterLevel
         });
         
         var benomeBase = new BenomeView(viewOptions);

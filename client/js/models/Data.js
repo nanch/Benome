@@ -712,7 +712,7 @@ var Context = Backbone.Model.extend({
                 }
 
                 var score = maxScore;
-                while (segmentIdx >= 0 && score > 0) {
+                while (segmentIdx >= 0 && score >= 0) {
                     var segmentAge = anchorTime - (segmentIdx * increment) - pointTime;
 
                     if (!options.decreaseImmed) {
@@ -722,7 +722,7 @@ var Context = Backbone.Model.extend({
                     score = Math.max(0, targetInterval - segmentAge) / targetInterval;
                     score = Math.min(maxScore, Math.round(score * maxScore));
 
-                    if (score > 0 && score >= segments[segmentIdx]) {
+                    if (score >= 0 && score >= segments[segmentIdx]) {
                         segments[segmentIdx] = score;
                     }
 

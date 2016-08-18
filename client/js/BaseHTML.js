@@ -89,7 +89,7 @@ var baseHTML = '' +
 '    <br>' + 
 '' + 
 '    <div class="export">' +
-'        <div class="button export-data">Export</div>' +
+'        <div class="button export-complete">Complete Export</div>' +
 '    </div>' +
 '    <br>' + 
 '' + 

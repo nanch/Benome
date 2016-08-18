@@ -553,16 +553,22 @@ _.extend(Controller.prototype, {
                 'top': (y - ($addFeedback.height() / 2)) + 'px'
             })
             .off('click')
-            .on('click', function(e) {
-                var pos = {
-                    x: x,
-                    y: y
-                }
-
-                G.trigger('ShowPointDetail', pointID, contextID, null, pos);
-                return false;
-            })
             .text(pointLabel);
+
+
+
+        if (G.FEATURE('AddFeedbackInteractive')) {
+            $addFeedback
+                .on('click', function(e) {
+                    var pos = {
+                        x: x,
+                        y: y
+                    }
+
+                    G.trigger('ShowPointDetail', pointID, contextID, null, pos);
+                    return false;
+                });
+        }
 
         _.delay(function() {
             $addFeedback
