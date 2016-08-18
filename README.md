@@ -9,32 +9,32 @@ If you think it could do so much more than that, you're absolutely right. But we
 ### One-time Setup 
 
 #### Install Pre-requisites (e.g. Ubuntu).
-apt-get install -y git nodejs npm
+	apt-get install -y git nodejs npm
 
 #### Clone the repository
-git clone https://bitbucket.org/shazel/benome.git
+	git clone https://bitbucket.org/shazel/benome.git
 
 #### Install the various NPM modules
 
 *In benome/client/*
 
-npm install backbone hammerjs jquery jquery.mousewheel jquery.event.drag d3
-cd node_modules
-ln -s ../js app
-cd ..
+	npm install backbone hammerjs jquery jquery.mousewheel jquery.event.drag d3
+	cd node_modules
+	ln -s ../js app
+	cd ..
 
 *In benome/client/build*
 
-npm install gulp gulp-util gulp-sourcemaps gulp-uglify vinyl-source-stream vinyl-buffer watchify browserify lodash
+	npm install gulp gulp-util gulp-sourcemaps gulp-uglify vinyl-source-stream vinyl-buffer watchify browserify lodash
 
 ### Build
 *In benome/client/build/*
 
 #### Development build with auto-reloading
-gulp dev
+	gulp dev
 
 #### Minified build
-gulp prod
+	gulp prod
 
 ## Setting up the server
 
