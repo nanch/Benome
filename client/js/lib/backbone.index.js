@@ -1,4 +1,4 @@
-var _ = require('backbone/node_modules/underscore'),
+var _ = require('underscore'),
     Backbone = require('backbone');
 
 /**

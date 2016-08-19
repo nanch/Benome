@@ -17,7 +17,7 @@ along with Benome. If not, see http://www.gnu.org/licenses/.
 */
 
 var $ = require('jquery'),
-    _ = require('backbone/node_modules/underscore');
+    _ = require('underscore');
 
 var BenomeGlobal = require('app/Global'),
     Cluster = require('app/Cluster'),

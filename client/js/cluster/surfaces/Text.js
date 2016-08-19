@@ -1,6 +1,6 @@
 var $ = require('jquery'),
     Backbone = require('backbone'),
-    _ = require('backbone/node_modules/underscore'),
+    _ = require('underscore'),
     moment = require('app/lib/moment');
 
 var SurfaceView = require('app/cluster/SurfaceView'),

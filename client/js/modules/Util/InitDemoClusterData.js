@@ -1,4 +1,4 @@
-var _ = require('backbone/node_modules/underscore');
+var _ = require('underscore');
 var createPoint = require('app/modules/Util/CreatePoint'),
     randomPointStream = require('app/modules/Util/RandomPointStream2'),
     initCollections = require('app/modules/Util/InitCollections');

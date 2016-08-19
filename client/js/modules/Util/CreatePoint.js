@@ -1,4 +1,4 @@
-var _ = require('backbone/node_modules/underscore');
+var _ = require('underscore');
 var Point = require('app/modules/Data/Point');
 
 function createPoint(pointID, contextID, details) {

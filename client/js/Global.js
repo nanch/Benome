@@ -17,7 +17,7 @@ along with Benome. If not, see http://www.gnu.org/licenses/.
 */
 
 var Backbone = require('backbone'),
-	_ = require('backbone/node_modules/underscore'),
+	_ = require('underscore'),
     QuickContextActions = require('app/views/QuickContextActions'),
     DragDrop = require('app/DragDrop'),
     Intervals = require('app/Intervals'),

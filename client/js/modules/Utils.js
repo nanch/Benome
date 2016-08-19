@@ -19,7 +19,7 @@ along with Benome. If not, see http://www.gnu.org/licenses/.
 // Libs
 var $ = require('jquery'),
     jQueryColor = require('app/lib/jquery.color'),
-    _ = require('backbone/node_modules/underscore');
+    _ = require('underscore');
 
 // -------------
 

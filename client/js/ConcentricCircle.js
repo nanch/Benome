@@ -18,7 +18,7 @@ along with Benome. If not, see http://www.gnu.org/licenses/.
 
 var $ = require('jquery'),
     jQueryColor = require('app/lib/jquery.color'),
-    _ = require('backbone/node_modules/underscore');
+    _ = require('underscore');
 
 function ConcentricCircle(options) {
     options = options || {};

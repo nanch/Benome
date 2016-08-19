@@ -17,7 +17,7 @@ along with Benome. If not, see http://www.gnu.org/licenses/.
 */
 
 // Libs
-var _ = require('backbone/node_modules/underscore');
+var _ = require('underscore');
 
 // App
 var CurveSegments = require('app/wavecurve/CurveSegments'),

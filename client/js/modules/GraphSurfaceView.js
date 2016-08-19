@@ -1,6 +1,6 @@
 var $ = require('jquery'),
     Backbone = require('backbone'),
-    _ = require('backbone/node_modules/underscore'),
+    _ = require('underscore'),
     Hammer = require('hammerjs');
 
 // Classes

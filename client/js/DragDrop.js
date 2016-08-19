@@ -17,7 +17,7 @@ along with Benome. If not, see http://www.gnu.org/licenses/.
 */
 
 var $ = require('jquery'),
-	_ = require('backbone/node_modules/underscore'),
+	_ = require('underscore'),
     Hammer = require('hammerjs');
 
 function DragDrop($el, options) {

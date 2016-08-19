@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with Benome. If not, see http://www.gnu.org/licenses/.
 */
 
-var _ = require('backbone/node_modules/underscore'),
+var _ = require('underscore'),
 	sum = require('app/modules/Util/Sum');
 
 // All arrays must be of same length or column sum will be NaN

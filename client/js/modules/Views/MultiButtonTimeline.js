@@ -18,7 +18,7 @@ along with Benome. If not, see http://www.gnu.org/licenses/.
 
 // Libs
 var $ = require('jquery'),
-    _ = require('backbone/node_modules/underscore'),
+    _ = require('underscore'),
     Backbone = require('backbone');
 
 var ButtonTimelineView = require('app/modules/Views/ButtonTimelineView'),

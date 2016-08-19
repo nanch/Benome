@@ -18,7 +18,7 @@ along with Benome. If not, see http://www.gnu.org/licenses/.
 
 var $ = require('jquery'),
     Backbone = require('backbone'),
-    _ = require('backbone/node_modules/underscore');
+    _ = require('underscore');
 
 var ActivityIntervalView = require('app/views/ActivityIntervalView');
 

@@ -8,8 +8,8 @@ If you think it could do so much more than that, you're absolutely right. But we
 
 ### One-time Setup 
 
-#### Install Pre-requisites (e.g. Ubuntu).
-	apt-get install -y git nodejs npm
+#### Install latest NodeJS & NPM
+	[Install NodeJS](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)
 
 #### Clone the repository
 	git clone https://bitbucket.org/shazel/benome.git
@@ -18,7 +18,7 @@ If you think it could do so much more than that, you're absolutely right. But we
 
 *In benome/client/*
 
-	npm install backbone hammerjs jquery jquery.mousewheel jquery.event.drag d3
+	npm install backbone underscore hammerjs jquery jquery.mousewheel jquery.event.drag d3
 	cd node_modules
 	ln -s ../js app
 	cd ..
