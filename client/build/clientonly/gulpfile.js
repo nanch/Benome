@@ -30,7 +30,7 @@ var _ = require('lodash');
 
 gulp.task('prod', function() {
   var bundler = browserify({
-    entries: ['../js/Entry.js'],
+    entries: ['../../js/Entry.js'],
     debug: true
   });
 
@@ -46,12 +46,18 @@ gulp.task('prod', function() {
   };
 
   var bundleResult = bundle();
-  gulp.src(['../index.html']).pipe(gulp.dest('./deploy'));
+  gulp.src(['../../html/clientonly/*']).pipe(gulp.dest('./deploy'));
+  gulp.src(['../../images/*']).pipe(gulp.dest('./deploy/images'));
+  gulp.src(['../../css/*']).pipe(gulp.dest('./deploy/css'));
   return bundleResult;
 });
 
-var devBundler = watchify(browserify('../js/Entry.js', watchify.args));
+var devBundler = watchify(browserify('../../js/Entry.js', watchify.args));
 function bundle() {
+  gulp.src(['../../html/clientonly/*']).pipe(gulp.dest('./deploy'));
+  gulp.src(['../../images/*']).pipe(gulp.dest('./deploy/images'));
+  gulp.src(['../../css/*']).pipe(gulp.dest('./deploy/css'));
+
   return devBundler.bundle()
     // log errors if they happen
     .on('error', function(error) {

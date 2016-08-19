@@ -1,0 +1,61 @@
+<html manifest="cache.manifest">
+<head>
+    <title>Local Benome</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="initial-scale=1.0, width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="msapplication-tap-highlight" content="no" />
+    <link rel="stylesheet" href="css/Benome.css" type="text/css" />
+    <script src="js/bundle.js"></script>
+    <script>
+    $(function() {
+        var benome = new BENOME(),
+            paramInstanceID = benome.QueryString.LocalID,
+            instanceID = parseInt(paramInstanceID) || parseInt(10000 + Math.random() * 1000000);
+
+        instanceID = instanceID.toString();
+
+        if (!paramInstanceID) {
+            var queryString = window.location.search,
+                separator = queryString ? '&' : '?',
+                port = window.location.port ? ':' + window.location.port : '';
+
+            var instanceUrl = window.location.protocol + '//' + window.location.hostname + port + window.location.pathname + queryString + separator + 'LocalID=' + instanceID;
+
+            var stateObject = {
+                'Website' : instanceUrl
+            };
+            window.history.replaceState(stateObject, window.document.title, instanceUrl);
+        }
+
+        benome.init({
+            container: $('#benome-1'),
+            instanceID: instanceID,
+            localOnly: true,
+            enabledApps: ['Project'],
+            continuousTiming: benome.QueryString.ct === '1',
+            setBackgroundFilterLevel: benome.QueryString.hbfl !== '1',
+            features: {
+                'ActionHistory': false,
+                'ActionTimeline': false,
+                'ClusteredEdit': false,
+                'AddFeedbackInteractive': false,
+                'MovableFocus': false,
+                'LeafFocusAutoAdd': false,
+                'PointShortPress': false,
+                'PointLongPress': false,
+
+                'DetailLevels': true,
+                'ActivityPullForward': true,
+                'ActivityPushBack': true
+            }
+        });
+        window.BE = benome;
+	});
+    </script>
+</head>
+<body oncontextmenu="return false;">
+    <div id="benome-1" style="position: absolute; left: 0%; top: 0%; width: 100%; height: 100%;"></div>
+</body>
+</html>

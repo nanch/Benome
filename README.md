@@ -1,6 +1,6 @@
 # Benome
 
-Benome captures, processes, and visualizes observed behavior. It's a user interface, a prediction engine, and a persuasion system all tied into a neat package that helps anyone solve any problem.
+Benome captures, processes, and visualizes observed behavior. It's a user interface, a prediction engine, and a self-persuasion system all tied into a neat package that helps anyone solve any problem.
 
 If you think it could do so much more than that, you're absolutely right. But we'll keep it simple for now.
 
@@ -9,7 +9,7 @@ If you think it could do so much more than that, you're absolutely right. But we
 ### One-time Setup 
 
 #### Install latest NodeJS & NPM
-	[Install NodeJS](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)
+[NodeJS installer page](https://nodejs.org/en/download/package-manager/)
 
 #### Clone the repository
 	git clone https://bitbucket.org/shazel/benome.git
@@ -27,13 +27,13 @@ If you think it could do so much more than that, you're absolutely right. But we
 
 	npm install gulp gulp-util gulp-sourcemaps gulp-uglify vinyl-source-stream vinyl-buffer watchify browserify lodash
 
-### Build
-*In benome/client/build/*
+### Build client-only version (LocalStorage persistence)
+*In benome/client/build/clientonly/*
 
 #### Development build with auto-reloading
 	gulp dev
 
-#### Minified build
+#### Minified build with source maps
 	gulp prod
 
 ## Setting up the server
