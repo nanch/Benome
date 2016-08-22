@@ -134,7 +134,7 @@ var Benome = Backbone.View.extend({
             }
         }
 
-        $('.admin-view .export > .export-data', this.$el).click(function() {
+        $('.admin-view .export > .export-complete', this.$el).click(function() {
             sendFile('data:application/json;charset=US-ASCII;base64,' + btoa(G.exportData()), 'BenomeExport_' + _this.instanceID + '.json');
         });
 
