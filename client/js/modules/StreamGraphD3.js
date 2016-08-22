@@ -202,7 +202,6 @@ _.extend(StreamGraphD3.prototype, {
             .range([height, 0]);
 
         var area = d3.area()
-            //.curve(d3.curveMonotoneX)
             .x(function(d, idx, layer) {
                 return x(idx);
             })
@@ -210,7 +209,7 @@ _.extend(StreamGraphD3.prototype, {
                 return y(d[0]) - (height / 2);
             })
             .y1(function(d) {
-                return y(d[1]) - (height / 2); // d[0] + d[1]);
+                return y(d[1]) - (height / 2);
             });
 
         var svg = d3.select(this.$svgContainer.get()[0]).append('svg')

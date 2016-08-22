@@ -1,8 +1,5 @@
 CACHE MANIFEST
-# rev 007
-
-# Libs
-/static/js/d3.min.js
+# rev 008
 
 # App Code
 /static/js/bundle.js

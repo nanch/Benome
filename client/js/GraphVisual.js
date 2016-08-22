@@ -18,7 +18,8 @@ along with Benome. If not, see http://www.gnu.org/licenses/.
 
 var $ = require('jquery'),
     Backbone = require('backbone'),
-    _ = require('underscore');
+    _ = require('underscore'),
+    d3 = require('d3');
 
 function GraphVisual(modeView, graphDataFunc, options) {
     options = options || {};
@@ -178,44 +179,80 @@ _.extend(GraphVisual.prototype, {
         }
     },
 
-    renderStreamGraphSVG: function(width, height, numSegments, layers, graphOptions) {
-        graphOptions = graphOptions || {};
+    countLayers: function(layers) {
+        var numLayers = 0;
+        _.each(_.compact(layers), function(layer) {
+            numLayers += layer.NumLayers || 1;
+        });
+
+        return numLayers;
+    },
+
+    renderStreamGraphSVG: function(width, height, numSegments, layers, options) {
+        options = options || {};
 
         if (!this.$svgContainer) {
             this.$svgContainer = $('<div>').hide().appendTo('body');
         }
         this.$svgContainer.empty();
 
-        // FIXME: Temporarily force max Y value into last column to ensure absolute scaling
-        _.each(layers, function(layer) {
-            layer.Data[layer.Data.length - 1] = layer.NumLayers * 100;
-        });
+        var numLayers = this.countLayers(layers);
 
-        var stack = d3.layout.stack().offset('silhouette'),
-            layers0 = stack(layers.map(function(d) {
-                    return formatLayer(d);
-                }));
+        if (options.forceMax) {
+            _.each(layers, function(layer) {
+                layer.Data[layer.Data.length - 1] = layer.NumLayers * 100;
+            });
+        }
+
+        var layerKeys = _.range(0, numLayers);
+
+        function formatLayers(layers) {
+            return _.map(_.range(0, numSegments), function(i) {
+                var z = {};
+                _.each(layers, function(layer, layerIdx) {
+                    var layerData = layer.Data;
+                    z[layerIdx] = layerData[i];
+                });
+
+                return z;
+            });
+        }
+
+        var stack = d3.stack()
+                        .keys(layerKeys)
+                        .offset(d3.stackOffsetSilhouette),
+            layers0 = stack(formatLayers(layers));
 
         var layerColors = _.map(layers, function(layer) {
             return layer.Color || '#888';
         });
 
-        var x = d3.scale.linear()
+        var x = d3.scaleLinear()
             .domain([0, numSegments - 1])
             .range([0, width]);
 
         var yMax = d3.max(layers0, function(layer) {
             return d3.max(layer, function(d) {
-                return d.y0 + d.y;
+                return d[0] + d[1];
             });
         });
 
-        var y = d3.scale.linear()
+        var y = d3.scaleLinear()
             .domain([0, yMax])
             .range([height, 0]);
 
-        var area = d3.svg.area()
-            .x(function(d) {
+        var area = d3.area()
+            .x(function(d, idx, layer) {
+                return x(idx);
+            })
+            .y0(function(d) {
+                return y(d[0]) - (height / 2);
+            })
+            .y1(function(d) {
+                return y(d[1]) - (height / 2);
+            });
+
+            /*.x(function(d) {
                 return x(d.x);
             })
             .y0(function(d) {
@@ -223,7 +260,7 @@ _.extend(GraphVisual.prototype, {
             })
             .y1(function(d) {
                 return y(d.y0 + d.y);
-            });
+            });*/
 
         var svg = d3.select(this.$svgContainer.get()[0]).append('svg')
                     .attr('width', width)

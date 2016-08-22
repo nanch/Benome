@@ -1,0 +1,26 @@
+<html _manifest="/app/cache.manifest">
+<head>
+    <title>{{ Username }} Benome</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="initial-scale=1.0, width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="msapplication-tap-highlight" content="no" />
+    <link rel="stylesheet" href="static/css/Benome.css" type="text/css" />
+    <script src="static/js/bundle.js"></script>
+    <script>
+    $(function() {
+        var benome = new BENOME();
+        benome.init({
+            container: $('#benome-1'),
+            instanceID: 'ABCDEF',
+            localOnly: false
+        });
+        window.BE = benome;
+	});
+    </script>
+</head>
+<body oncontextmenu="return false;">
+    <div id="benome-1" style="position: absolute; left: 0%; top: 0%; width: 100%; height: 100%;"></div>
+</body>
+</html>
