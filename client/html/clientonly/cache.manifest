@@ -1,14 +1,14 @@
 CACHE MANIFEST
-# rev 003
+# rev 004
 
 # App Code
-js/bundle.js
+static/js/bundle.js
 
 # CSS
-css/Benome.css
+static/css/Benome.css
 
 # Images
-images/background.jpg
-images/background-light.jpg
-images/right.png
-images/left.png
+static/images/background.jpg
+static/images/background-light.jpg
+static/images/right.png
+static/images/left.png

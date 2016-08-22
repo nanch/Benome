@@ -42,21 +42,21 @@ gulp.task('prod', function() {
       .pipe(sourcemaps.init({loadMaps: true}))
          .pipe(uglify())
       .pipe(sourcemaps.write('./'))
-      .pipe(gulp.dest('./deploy/js'));
+      .pipe(gulp.dest('./deploy/static/js'));
   };
 
   var bundleResult = bundle();
   gulp.src(['../../html/clientonly/*']).pipe(gulp.dest('./deploy'));
-  gulp.src(['../../images/*']).pipe(gulp.dest('./deploy/images'));
-  gulp.src(['../../css/*']).pipe(gulp.dest('./deploy/css'));
+  gulp.src(['../../images/*']).pipe(gulp.dest('./deploy/static/images'));
+  gulp.src(['../../css/*']).pipe(gulp.dest('./deploy/static/css'));
   return bundleResult;
 });
 
 var devBundler = watchify(browserify('../../js/Entry.js', watchify.args));
 function bundle() {
   gulp.src(['../../html/clientonly/*']).pipe(gulp.dest('./deploy'));
-  gulp.src(['../../images/*']).pipe(gulp.dest('./deploy/images'));
-  gulp.src(['../../css/*']).pipe(gulp.dest('./deploy/css'));
+  gulp.src(['../../images/*']).pipe(gulp.dest('./deploy/static/images'));
+  gulp.src(['../../css/*']).pipe(gulp.dest('./deploy/static/css'));
 
   return devBundler.bundle()
     // log errors if they happen
@@ -74,7 +74,7 @@ function bundle() {
       .pipe(sourcemaps.init({loadMaps: true})) // loads map from browserify file
       .pipe(sourcemaps.write('./')) // writes .map file*/
 
-    .pipe(gulp.dest('./deploy/js'));
+    .pipe(gulp.dest('./deploy/static/js'));
 }
 gulp.task('dev', bundle);
 devBundler.on('update', bundle); // on any dep update, runs the bundler
