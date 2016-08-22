@@ -1085,7 +1085,31 @@ body {
     background-color: red;
 } */
 
-.benome .admin-view {
+.benome .gethelp-view {
+    position: absolute;
+    font-size: 150px;
+    border: 0.1em solid;
+    border-radius: 100%;
+    text-align: center;
+    line-height: 1;
+    cursor: pointer;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+.benome .help-view iframe {
+    width: 100%;
+    height: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.benome .content-box {
     position: absolute;
     left: 10%;
     top: 10%;

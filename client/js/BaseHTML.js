@@ -60,7 +60,7 @@ var baseHTML = '' +
 '    </div>' +
 '</div>' +
 '' + 
-'<div class="admin-view">' +
+'<div class="content-box admin-view">' +
 '    <div class="left-col">' +
 '    <div class="change-auth">' +
 '		 <h4>Change Password</h4>' +
@@ -99,6 +99,10 @@ var baseHTML = '' +
 '	 </div>' + 
 '' + 
 '    <div class="button close-admin">Close</div>' +
+'</div>' +
+'' + 
+'<div class="content-box help-view">' +
+'	<iframe src="about:blank"></iframe>' +
 '</div>' +
 '' + 
 '<div class="working-overlay overlay">' +

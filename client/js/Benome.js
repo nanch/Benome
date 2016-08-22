@@ -38,6 +38,8 @@ var baseHTML = require('app/BaseHTML'),
     TimelineView = require('app/views/TimelineView'),
     ActivityPath = require('app/ActivityPath'),
     AdminView = require('app/views/AdminView'),
+    GetHelpView = require('app/views/GetHelpView'),
+    HelpView = require('app/views/HelpView'),
     AppController = require('app/Controller');
 
 // -------------
@@ -195,6 +197,20 @@ var Benome = Backbone.View.extend({
         });
         G.adminView = this.adminView;
         this.adminView.render().$el.appendTo(this.$container);
+
+        this.helpView = new HelpView({
+            el: $('.help-view', this.$el),
+            $overlay: G.$overlay
+        });
+        G.helpView = this.helpView;
+        this.helpView.render().$el.appendTo(this.$container);
+
+        this.getHelpView = new GetHelpView({});
+        this.getHelpView.render().$el.appendTo(this.$container);
+        var _this = this;
+        this.getHelpView.on('Click', function() {
+            _this.helpView.show();
+        });
 
         this.$timelineContainer = $('.timeline-container', this.$container);
 
@@ -768,6 +784,16 @@ var Benome = Backbone.View.extend({
         var G = this.G,
             globalSize = G.globalSize(),
             d = (globalSize.height + globalSize.width) / 2;
+
+        this.getHelpView.$el
+            .show()
+            .css({
+                'left': (d * 0.01) + 'px',
+                'top': (d * 0.01) + 'px',
+                'width': (d * 0.075) + 'px',
+                'height': (d * 0.075) + 'px',
+                'font-size': (d * 0.075 * 0.9) + 'px'
+            });
 
         if (G.isAuthenticated || this.localOnly) {
             this.loginView.$el.hide();
