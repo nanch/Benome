@@ -4,3 +4,6 @@ Archive/*
 *node_modules*
 /*.conf
 /test/
+server/controller/templates/base.html
+server/controller/templates/benome.mf
+SECRET.key
