@@ -1,6 +1,6 @@
 # Benome
 
-Benome captures, processes, and visualizes observed behavior. It's a user interface, a prediction engine, and a self-persuasion system all tied into a neat package that helps anyone solve any problem.
+[Benome](https://benome.ca) captures, processes, and visualizes observed behavior. It's a user interface, a prediction engine, and a self-persuasion system all tied into a neat package that helps anyone solve any problem.
 
 If you think it could do so much more than that, you're absolutely right. But we'll keep it simple for now.
 
