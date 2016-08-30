@@ -28,7 +28,7 @@ import requests
 from redis import StrictRedis
 from flask import Flask, Response, request, make_response, render_template, \
                     redirect, session, abort
-from flask.ext.login import LoginManager, UserMixin, login_required, login_user, logout_user, \
+from flask_login import LoginManager, UserMixin, AnonymousUserMixin, login_required, login_user, logout_user, \
                     current_user
 
 from benome.utils import json_response, json_get
@@ -75,6 +75,7 @@ class BenomeControllerException(Exception):
 class BenomeAuthException(BenomeControllerException):
     pass
 
+@app.errorhandler(Exception)
 def api_exception_handler(error):
     from flask import g
 
@@ -101,11 +102,6 @@ def api_exception_handler(error):
         return '%s(%s)' % (g.jsonp, simplejson.dumps(error_result))
     else:
         return json_response(error_result), http_code
-
-def setup_api_exception(flask_app):
-    flask_app.error_handler_spec[None][None] = [((BenomeAuthException, BenomeControllerException, Exception), api_exception_handler)]
-
-setup_api_exception(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -192,22 +188,9 @@ def get_global_port():
     # except:
     #     pass
 
-class AnonymousUser(UserMixin):
-    def __init__(self):
-        self.id = 'Anonymous'
-        self.name = self.id
-
-    def get_name(self):
-        return self.name
-
-    def get_id(self):
-        return self.id
-
+class AnonymousUser(AnonymousUserMixin):
     def get_port(self):
         return get_global_port()
-
-    def is_authenticated(self):
-        return False
 
 login_manager.anonymous_user = AnonymousUser
 
@@ -245,7 +228,7 @@ def load_user(user_id):
 
 @app.route('/test', methods=['GET'])
 def client_test():
-    if not current_user or not current_user.is_authenticated():
+    if not current_user or current_user.is_anonymous:
         return 'Unauthorized', 403
 
     return json_response(auth_result(current_user)), 200
@@ -254,7 +237,7 @@ def client_test():
 @app.route('/data/load/', methods=['GET'])
 #@login_required
 def data_load(context_id=None):
-    if not current_user or not current_user.is_authenticated():
+    if not current_user or current_user.is_anonymous:
         return json_response({
             'ContextID': None,
             'Points': [],
@@ -327,7 +310,7 @@ def app_numeric():
 
 @app.route('/user/logout', methods=['POST', 'GET'])
 def user_logout():
-    if current_user and current_user.is_authenticated():
+    if current_user and not current_user.is_anonymous:
         logout_user()
     else:
         raise BenomeControllerException('Not logged in')
@@ -343,7 +326,7 @@ def auth_result(user):
 
     graph_data = None
 
-    if False and user.is_authenticated():
+    if False and not user.is_anonymous:
         query_result = call_container('data_query')
         graph_data = query_result['GraphData']
 
@@ -371,7 +354,7 @@ def user_login():
     user_id = None
     context_id = None
 
-    if current_user and current_user.is_authenticated() and current_user.get_name() == username:
+    if current_user and not current_user.is_anonymous and current_user.get_name() == username:
         user_id = current_user.get_id()
         context_id = current_user.get_root_context_id()
         user = current_user
@@ -388,7 +371,7 @@ def user_login():
 
 @app.route('/user/change_password', methods=['POST'])
 def user_change_password():
-    if current_user and not current_user.is_authenticated():
+    if current_user and current_user.is_anonymous:
         raise BenomeControllerException('Must be already authenticated')
 
     old_password = request.form.get('OldPassword')
@@ -408,7 +391,7 @@ def user_change_password():
 def user_root(username):
     display_username = ''
 
-    if current_user and current_user.is_authenticated():
+    if current_user and not current_user.is_anonymous:
         current_username = current_user.get_name()
         if current_username != username:
             return redirect('/' + current_username)
@@ -439,7 +422,7 @@ def get_container_host():
     ip = '127.0.0.1'
 
     from flask.ext.login import current_user
-    if not current_user.is_authenticated():
+    if current_user.is_anonymous:
         raise BenomeAuthException('Authentication required')
 
     port = current_user.get_port()
@@ -491,7 +474,7 @@ def call_container(cmd, data=None, port=None, timeout=5, **kwargs):
     base_host = get_container_host()
 
     # from flask.ext.login import current_user
-    # if not current_user.is_authenticated():
+    # if current_user.is_anonymous:
     #     raise Exception('Authentication required')
 
     # if not port:

@@ -29,7 +29,7 @@ from uuid import uuid4
 from Queue import Empty
 
 from flask import Flask, request
-from flask.ext.login import LoginManager, UserMixin, login_user, logout_user, current_user
+from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user
 
 from enc_data import EncryptedVolume
 from benome.utils import json_response, json_post
@@ -61,6 +61,7 @@ class BenomeAuthError(BenomeContainerException):
 class BenomeDataError(BenomeContainerException):
     pass
 
+@app.errorhandler(Exception)
 def api_exception_handler(error):
     return_code = 200
 
@@ -81,11 +82,6 @@ def api_exception_handler(error):
         'Message': str(error)
     }
     return json_response(error_result), return_code
-
-def setup_api_exception(flask_app):
-    flask_app.error_handler_spec[None][None] = [((BenomeAuthError, BenomeDataError, BenomeContainerException, Exception), api_exception_handler)]
-
-setup_api_exception(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
