@@ -368,6 +368,27 @@ var Contexts = Backbone.Collection.extend({
         else {
             return exportStruct;
         }
+    },
+
+    exportTree: function(rootContextID) {
+        rootContextID = rootContextID || this.rootID;
+        var rootContext = this.get(rootContextID);
+
+        function traverse(context) {
+            var contextStruct = {
+                'label': context.getNS('Label'),
+                'TargetFrequency': context.getNS('TargetFrequency') || null,
+                'children': []
+            }
+
+            _.each(context.getAssocModels('down'), function(childContext) {
+                contextStruct['children'].push(traverse(childContext));
+            }, this);
+
+            return contextStruct;
+        }
+
+        return traverse(rootContext);
     }
 });
 

@@ -21,7 +21,7 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     _ = require('underscore'),
     Hammer = require('hammerjs'),
-    moment = require('app/lib/moment');
+    moment = require('moment');
 Backbone.$ = $;
 
 var PointListView = require('app/views/PointListView');

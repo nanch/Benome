@@ -21,7 +21,7 @@ var $ = require('jquery'),
     jQueryMouseWheel = require('jquery.mousewheel')($),
     _ = require('underscore'),
     Backbone = require('backbone'),
-    moment = require('app/lib/moment'),
+    moment = require('moment'),
     BackboneDualStorage = require('app/lib/backbone.dualstorage.amd');
 
 window._ = _;

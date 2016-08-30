@@ -21,7 +21,7 @@ var $ = require('jquery'),
     jQueryColor = require('app/lib/jquery.color'),
     _ = require('underscore'),
     Backbone = require('backbone'),
-    moment = require('app/lib/moment');
+    moment = require('moment');
 
 // -------------
 
@@ -668,7 +668,7 @@ _.extend(Cluster.prototype, {
         }
 
         this.focusID = layoutData.focusID;
-        this.trigger('FocusChanged', this, this.focusID, this.contexts.get(this.focusID), this.lastFocusID, this.contexts.get(this.lastFocusID));
+        this.trigger('FocusChanged', this, this.focusID, this.contexts.get(this.focusID), this.lastFocusID, this.contexts.get(this.lastFocusID), layoutData);
         this.lastLayoutData = layoutData;
 
         if (this.lastData) {

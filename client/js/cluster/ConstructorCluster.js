@@ -19,7 +19,7 @@ along with Benome. If not, see http://www.gnu.org/licenses/.
 var $ = require('jquery'),
     Backbone = require('backbone'),
     _ = require('underscore'),
-    moment = require('app/lib/moment');
+    moment = require('moment');
 
 var BenomeGlobal = require('app/Global'),
     Cluster = require('app/Cluster'),

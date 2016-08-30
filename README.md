@@ -18,7 +18,7 @@ If you think it could do so much more than that, you're absolutely right. But we
 
 *In benome/client/*
 
-	npm install backbone underscore hammerjs jquery jquery.mousewheel jquery.event.drag d3
+	npm install backbone underscore hammerjs jquery@2.2.4 jquery.mousewheel jquery.event.drag d3 moment
 	cd node_modules
 	ln -s ../js app
 	cd ..

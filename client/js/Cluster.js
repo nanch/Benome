@@ -21,7 +21,7 @@ var $ = require('jquery'),
     jQueryColor = require('app/lib/jquery.color'),
     _ = require('underscore'),
     Backbone = require('backbone'),
-    moment = require('app/lib/moment');
+    moment = require('moment');
 
 
 // -------------

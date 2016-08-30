@@ -20,7 +20,7 @@ along with Benome. If not, see http://www.gnu.org/licenses/.
 var $ = require('jquery'),
     _ = require('underscore'),
     Backbone = require('backbone'),
-    moment = require('app/lib/moment');
+    moment = require('moment');
 
 window.$ = window.jQuery = $;
 

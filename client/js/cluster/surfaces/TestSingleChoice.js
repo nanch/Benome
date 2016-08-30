@@ -1,7 +1,7 @@
 var $ = require('jquery'),
     Backbone = require('backbone'),
     _ = require('underscore'),
-    moment = require('app/lib/moment');
+    moment = require('moment');
 
 var BenomeGlobal = require('app/Global'),
     SurfaceView = require('app/cluster/SurfaceView'),

@@ -21,7 +21,7 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     _ = require('underscore');
 
-var moment = require('app/lib/moment');
+var moment = require('moment');
 
 Backbone.$ = $;
 
