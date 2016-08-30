@@ -42,6 +42,8 @@ var HistoryView = Backbone.View.extend({
         this.pointDragHandler = options.dragHandler || null;
         this.hideLabels = options.hideLabels || false;
 
+        this.pointViewCache = {};
+
         this.$el.attr('BDragSource', '1');
         this.$el.data('ViewRef', this);
 
@@ -150,7 +152,7 @@ var HistoryView = Backbone.View.extend({
 
             if (points.length > 0) {
                 _.each(points, function(point) {
-                    var pointView = new PointListView({
+                    var pointView = this.pointViewCache[point.id] || new PointListView({
                         G: this.G,
                         model: point,
                         hideLabel: this.hideLabels,
@@ -161,6 +163,7 @@ var HistoryView = Backbone.View.extend({
                         dragHandler: this.pointDragHandler,
                         dropHandler: this.pointDropHandler
                     });
+                    this.pointViewCache[point.id] = pointView;
                     this.pointViews.push(pointView);
                     $col.append(pointView.render());
 

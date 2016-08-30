@@ -106,6 +106,7 @@ var PointListView = Backbone.View.extend({
     },
 
     render: function() {
+        this.$el.data('ViewRef', this);
         if (this.$label) {
             this.$label.text(this.model.getLabel());
         }

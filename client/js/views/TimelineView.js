@@ -45,6 +45,8 @@ var TimelineView = Backbone.View.extend({
         this.visible = !!options.visible;
         this.clusterController = options.clusterController;
         this.timeIntervalHours = 4;
+
+        this.pointViewCache = {};
         this.setPointsCollection(options.points);
     },
 
@@ -109,7 +111,7 @@ var TimelineView = Backbone.View.extend({
                 this.$el.append($timeItem);
             }
             else {
-                var pointView = new PointListView({
+                var pointView = this.pointViewCache[point.id] || new PointListView({
                                                     G: this.G,
                                                     model: point,
                                                     hideLabel: this.hideLabels,
@@ -117,6 +119,8 @@ var TimelineView = Backbone.View.extend({
                                                     dragHandler: this.dragHandler,
                                                     dropHandler: this.pointDropHandler
                                                 });
+
+                this.pointViewCache[point.id] = pointView;
                 this.pointViews.push(pointView);
                 this.$el.append(pointView.render());
 
