@@ -40,7 +40,8 @@ var baseHTML = require('app/BaseHTML'),
     AdminView = require('app/views/AdminView'),
     GetHelpView = require('app/views/GetHelpView'),
     HelpView = require('app/views/HelpView'),
-    AppController = require('app/Controller');
+    AppController = require('app/Controller'),
+    KeyboardHandler = require('app/modules/Keyboard');
 
 // -------------
 
@@ -243,6 +244,8 @@ var Benome = Backbone.View.extend({
         window.E = this;
         this.pressIndicator = new PressIndicator();
 
+        this.keyboardHandler = new KeyboardHandler();
+
         _.delay(this.appTimer, this.appTimerInterval);
 
         G.on('UserAuthenticated', function(userData) {
@@ -330,6 +333,7 @@ var Benome = Backbone.View.extend({
             var globalCluster = G.renderStructure(globalClusterDef, userCollection);
             _this.globalCluster = globalCluster;
             G.globalCluster = globalCluster;
+            _this.keyboardHandler.setCluster(_this.globalCluster.cluster);
 
             _this.appController = new AppController(globalCluster, G);
 

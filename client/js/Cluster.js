@@ -604,6 +604,7 @@ _.extend(Cluster.prototype, {
             this.G.localSet('LastFocus', this.focusID);
         }
         
+        this.trigger('FocusChanged', this, this.focusID, this.contexts.get(this.focusID), this.lastFocusID, this.contexts.get(this.lastFocusID), layoutData);
         this.lastLayoutData = layoutData;
 
         if (this.lastData) {
