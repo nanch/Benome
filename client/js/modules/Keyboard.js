@@ -125,8 +125,13 @@ _.extend(Keyboard.prototype, {
         }
         var focusData = layoutData.data[focusID],
             startAngle = focusData.startAngle,
-            orderedVisibleNeighbours = focusData.orderedNeighbours,
-            angleIncrement = 360 / orderedVisibleNeighbours.length;
+            orderedVisibleNeighbours = focusData.orderedNeighbours;
+
+        if (!orderedVisibleNeighbours) {
+            return;
+        }
+
+        var angleIncrement = 360 / orderedVisibleNeighbours.length;
 
         var y = _.map(orderedVisibleNeighbours, function(neighbourID, i) {
             var neighbourAngle = startAngle + (i * angleIncrement);
