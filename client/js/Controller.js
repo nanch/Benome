@@ -18,11 +18,15 @@ along with Benome. If not, see http://www.gnu.org/licenses/.
 
 var _ = require('underscore');
 
-var Data = require('app/models/Data');
+var Data = require('app/models/Data'),
+    KeyboardHandler = require('app/modules/Keyboard');
 
 function Controller(clusterController, G) {
     this.G = this.G || G || require('app/Global')();
     this.clusterController = clusterController;
+    this.keyboardHandler = new KeyboardHandler();
+    this.keyboardHandler.setCluster(clusterController.cluster);
+
     this.bindEvents();
 }
 
@@ -33,13 +37,102 @@ _.extend(Controller.prototype, {
                     'updatePoint', 'onCreateContext', 'renameContext', 'reparentContext',
                     'deleteContext', 'deletePoint', 'adjustContext', 'clusterClicked',
                     'showAdmin', 'logoutUser', 'changePassword', 'onShowContextRename',
-                    'updateContext', 'addContext', 'beforeFocusChanged');
+                    'updateContext', 'addContext', 'beforeFocusChanged', 'pushLayer', 'popLayer');
 
         // ************************
         // App-level
         // ************************
 
         var G = this.G;
+
+        this.keyboardHandler.on('CreateContext', function(keyboardHandler, cluster) {
+            _this.addContext(cluster.focusID, cluster.clusterID, {}, null, {
+                setFocus: true
+            });
+        });
+
+        this.keyboardHandler.on('CreateSiblingContext', function(keyboardHandler, cluster) {
+            var context = cluster.contexts.get(cluster.focusID),
+                parentContext = context.getParent(),
+                parentContextID = parentContext ? parentContext.id : cluster.focusID;
+
+            _this.addContext(parentContextID, cluster.clusterID, {}, null, {
+                setFocus: true
+            });
+        });
+
+        this.keyboardHandler.on('DeleteContext', function(keyboardHandler, cluster) {
+            _this.deleteContext(cluster.focusID, cluster.clusterID);
+        });
+
+        this.keyboardHandler.on('AddPoint', function(keyboardHandler, cluster) {
+            if (!cluster.contexts.get(cluster.focusID).isLeaf()) {
+                return;
+            }
+            _this.addPoint(cluster.focusID, cluster.clusterID, {
+                UpdatedAttributes: {
+                    Timing: {
+                        Time: Date.now() / 1000,
+                        Duration: 0
+                    }
+                }
+            }, null, {
+                showHistory: false,
+                showAddFeedback: true,
+                feedbackUnderCursor: false,
+                toParent: false,
+                showDetail: false
+            });
+        });
+
+        this.keyboardHandler.on('NarrowFilter', function(keyboardHandler, cluster) {
+            cluster.setFilterLevel(1, { relative: true, noRender: true});
+            cluster.debounceRender();
+        });
+
+        this.keyboardHandler.on('WidenFilter', function(keyboardHandler, cluster) {
+            cluster.setFilterLevel(-1, { relative: true, noRender: true});
+            cluster.debounceRender();
+        });
+
+        this.keyboardHandler.on('ToggleViewMode', function(keyboardHandler, cluster) {
+            var clusterController = cluster.controller;
+            if (!_.isFunction(clusterController.setClusterMode)) {
+                return;
+            }
+            var clusterMode = clusterController.clusterMode;
+            if (clusterMode == 'Compact') {
+                clusterController.setExpanded({render: true});
+            }
+            else if (clusterMode == 'Expanded') {
+                clusterController.setCompact({render: true});
+            }
+        });
+
+        this.keyboardHandler.on('ModifyContext', function(keyboardHandler, cluster) {
+            // FIXME
+            if (_this.layerStack.length > 0) {
+                return;
+            }
+            var focusView = cluster.getView(cluster.focusID);
+            cluster.trigger('DestroyerDrop', focusView, null, null, {});
+        });
+
+        this.keyboardHandler.on('CancelLayer', function(keyboardHandler, cluster) {
+            // FIXME
+            if (_this.layerStack.length > 0) {
+                G.trigger('PopLayer');
+                G.unsetUILayers();
+            }
+        });
+
+        this.keyboardHandler.on('SaveLayer', function(keyboardHandler, cluster) {
+            cluster.controller.trigger('LongPress');
+        });
+
+        this.keyboardHandler.on('FocusRoot', function(keyboardHandler, cluster) {
+            cluster.setFocus(cluster.rootID, true);
+        });
 
         G.on('ShowPointDetail', this.showPointDetail);
         G.on('BeforeFocusChanged', this.beforeFocusChanged);
@@ -97,6 +190,66 @@ _.extend(Controller.prototype, {
         G.on('AddLinkedContext', function(destViewID, srcViewID, destClusterID, srcClusterID) {
             console.log('AddLinkedContext');
         });
+
+        this.layerStack = [];
+        G.on('PushLayer', this.pushLayer);
+        G.on('PopLayer', this.popLayer);
+    },
+
+    pushLayer: function(zIndex, callback, passThru) {
+        var $overlay = $('<div>')
+                        .addClass('layer-overlay')
+                        .css({
+                            'z-index': zIndex
+                        })
+                        .appendTo(this.G.$el),
+
+            $container = $('<div>')
+                        .addClass('layer-container')
+                        .css({
+                            'z-index': zIndex + 1
+                        })
+                        .appendTo(this.G.$el);
+
+        this.layerStack.push({
+            zIndex: zIndex,
+            $overlay: $overlay,
+            $container: $container,
+            cluster: null
+        });
+
+        if (callback) {
+            var _this = this;
+            callback($container, passThru, function(clusterController) {
+                if (clusterController) {
+                    var cluster = clusterController.cluster;
+                    _this.layerStack[_this.layerStack.length - 1].cluster = cluster;
+                    _this.keyboardHandler.setCluster(cluster);
+                }
+            });
+        }
+    },
+
+    popLayer: function(callback) {
+        var layerDef = this.layerStack.pop();
+
+        if (layerDef) {
+            layerDef.$overlay.remove();
+            layerDef.$container.remove();
+
+            if (this.layerStack.length) {
+                var nextCluster = this.layerStack[this.layerStack.length - 1].cluster;
+                this.keyboardHandler.setCluster(nextCluster);
+            }
+            else {
+                // Back to global cluster
+                this.keyboardHandler.setCluster(this.clusterController.cluster);
+            }
+        }
+
+        if (callback) {
+            callback();
+        }
     },
 
     deleteContext: function(contextID, clusterID, noFocus, successCallback) {
@@ -196,7 +349,9 @@ _.extend(Controller.prototype, {
         });
     },
 
-    addContext: function(parentContextID, clusterID, attributes, loadCallback) {
+    addContext: function(parentContextID, clusterID, attributes, loadCallback, options) {
+        options = options || {};
+
         var G = this.G;
         var cluster = G.getCluster(clusterID);
         if (!cluster) {
@@ -217,6 +372,10 @@ _.extend(Controller.prototype, {
 
             associationCollection.addAssoc('up', contextID, parentContextID, {save: false});
             associationCollection.addAssoc('down', parentContextID, contextID, {save: false});
+
+            if (options.setFocus) {
+                cluster.setFocus(contextID);
+            }
 
             // Have to wait until the associations are added
             cluster.contexts.trigger('add', context);

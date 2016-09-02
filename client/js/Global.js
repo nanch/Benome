@@ -425,7 +425,7 @@ _.extend(Global.prototype, {
                         noRender: true
                     });
                 }
-                if (lastFocusID) {
+                if (lastFocusID && base.cluster.contexts.has(lastFocusID)) {
                     base.cluster.setFocus(lastFocusID, false);
                 }
             }

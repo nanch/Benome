@@ -224,7 +224,7 @@ _.extend(BaseClusterController.prototype, {
         return true;
     },
 
-    layerReady: function($layer, options) {
+    layerReady: function($layer, options, setClusterCallback) {
         options = options || {};
 
         var clusterDef = options.clusterDef;
@@ -241,6 +241,7 @@ _.extend(BaseClusterController.prototype, {
             console.log('layerCluster not initialized');
             return;
         }
+        setClusterCallback(layerCluster);
         options.layerCluster = layerCluster;
 
         var _this = this;

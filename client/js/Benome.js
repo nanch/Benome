@@ -40,8 +40,7 @@ var baseHTML = require('app/BaseHTML'),
     AdminView = require('app/views/AdminView'),
     GetHelpView = require('app/views/GetHelpView'),
     HelpView = require('app/views/HelpView'),
-    AppController = require('app/Controller'),
-    KeyboardHandler = require('app/modules/Keyboard');
+    AppController = require('app/Controller');
 
 // -------------
 
@@ -244,8 +243,6 @@ var Benome = Backbone.View.extend({
         window.E = this;
         this.pressIndicator = new PressIndicator();
 
-        this.keyboardHandler = new KeyboardHandler();
-
         _.delay(this.appTimer, this.appTimerInterval);
 
         G.on('UserAuthenticated', function(userData) {
@@ -333,7 +330,6 @@ var Benome = Backbone.View.extend({
             var globalCluster = G.renderStructure(globalClusterDef, userCollection);
             _this.globalCluster = globalCluster;
             G.globalCluster = globalCluster;
-            _this.keyboardHandler.setCluster(_this.globalCluster.cluster);
 
             _this.appController = new AppController(globalCluster, G);
 
@@ -358,7 +354,7 @@ var Benome = Backbone.View.extend({
             console.log(Date.now() - window.jsBeginTime);
         });
 
-        var contextStack = [];
+        this.contextStack = [];
 
         function renderContextStack(refView, viewState) {
             $('.context-stack', _this.$container).remove();
@@ -367,8 +363,8 @@ var Benome = Backbone.View.extend({
                 x = viewState.x - viewState.radius,
                 y = viewState.y - viewState.radius;
 
-            _.each(contextStack.reverse(), function(t, i) {
-                /*if (i == contextStack.length - 1) {
+            _.each(_this.contextStack.reverse(), function(t, i) {
+                /*if (i == _this.contextStack.length - 1) {
                     // Skip the most recent
                     return;
                 }*/
@@ -392,7 +388,7 @@ var Benome = Backbone.View.extend({
         }
 
         G.on('PopContext', function(view, viewState) {
-            contextStack.pop();
+            _this.contextStack.pop();
             renderContextStack(view, viewState);
         });
 
@@ -406,46 +402,6 @@ var Benome = Backbone.View.extend({
             });
 
             renderContextStack(view, viewState);
-        });
-
-        var layerStack = [];
-
-        G.on('PopLayer', function(callback) {
-            var layerDef = layerStack.pop();
-
-            if (layerDef) {
-                layerDef.$overlay.remove();
-                layerDef.$container.remove();
-            }
-
-            if (callback) {
-                callback();
-            }
-        });
-
-        G.on('PushLayer', function(zIndex, callback, passThru) {
-            var $overlay = $('<div>')
-                            .addClass('layer-overlay')
-                            .css({
-                                'z-index': zIndex
-                            })
-                            .appendTo(_this.$container),
-                $container = $('<div>')
-                            .addClass('layer-container')
-                            .css({
-                                'z-index': zIndex + 1
-                            })
-                            .appendTo(_this.$container);
-
-            layerStack.push({
-                zIndex: zIndex,
-                $overlay: $overlay,
-                $container: $container
-            });
-
-            if (callback) {
-                callback($container, passThru);
-            }
         });
     },
 

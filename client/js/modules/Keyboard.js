@@ -66,40 +66,64 @@ _.extend(Keyboard.prototype, {
         }
 
         var _this = this;
-        // Bind to keypad numbers (depends on numlock being on)
+        Mousetrap.stopCallback = function() {
+            return false;
+        }
 
+        // Bind to keypad numbers (depends on numlock being on)
         // Home row keypad analog. Disabled for now to avoid conflicts when typing.
         // ['m', 'j', 'u', 'i', 'o', 'l', '.', ',', 'k']
 
-        Mousetrap.bind(['1', '2', '3', '4', '5', '6', '7', '8', '9'], this.onNavKey);
+        Mousetrap.bind(['1', '2', '3', '4', '5', '6', '7', '8', '9', '.'], this.onNavKey);
 
-        Mousetrap.bind(['enter'], function(e) {
-            _this.trigger('AddPoint');
+        Mousetrap.bind('enter', function(e) {
+            if (e.code == 'NumpadEnter') {
+                _this.trigger('AddPoint', _this, _this.cluster);
+            }
+            else {
+                _this.trigger('SaveLayer', _this, _this.cluster);
+            }
         });
 
-        Mousetrap.bind(['+'], function(e) {
+        Mousetrap.bind('+', function(e) {
             _this.trigger('NarrowFilter', _this, _this.cluster);
         });
 
-        Mousetrap.bind(['-'], function(e) {
+        Mousetrap.bind('-', function(e) {
             _this.trigger('WidenFilter', _this, _this.cluster);
         });
 
-        Mousetrap.bind(['*'], function(e) {
+        Mousetrap.bind('*', function(e) {
             _this.trigger('ModifyContext', _this, _this.cluster);
         });
 
-        Mousetrap.bind(['/'], function(e) {
-            _this.trigger('ToggleViewMode', _this, _this.cluster);
+        Mousetrap.bind('/', function(e) {
+            if (e.code == 'NumpadDivide') {
+                _this.trigger('ToggleViewMode', _this, _this.cluster);
+                return false;
+            }
         });
 
-        Mousetrap.bind(['0'], function(e) {
-            _this.trigger('CreateContext', _this, _this.cluster);
+        Mousetrap.bind(['0', 'alt+0'], function(e, combo) {
+            if (e.altKey) {
+                _this.trigger('CreateSiblingContext', _this, _this.cluster);
+            }
+            else {
+                _this.trigger('CreateContext', _this, _this.cluster);
+            }
         });
 
-        function numpadDecimal(e) {
+        Mousetrap.bind('alt+5', function(e) {
+            _this.trigger('FocusRoot', _this, _this.cluster);
+        });
+
+        Mousetrap.bind('esc', function(e) {
+            _this.trigger('CancelLayer', _this, _this.cluster);
+        });
+
+        this.on('NumpadDecimal', function(e) {
             _this.trigger('DeleteContext', _this, _this.cluster);
-        }
+        });
     },
 
     setKeyboardState: function(contextList) {
@@ -123,7 +147,18 @@ _.extend(Keyboard.prototype, {
         if (!focusModel) {
             return;
         }
-        var focusData = layoutData.data[focusID],
+
+        this.clusterStateChanged(cluster);
+    },
+
+    clusterStateChanged: function(cluster) {
+        var layoutData = cluster.lastLayoutData;
+        if (!layoutData) {
+            return;
+        }
+
+        var focusID = cluster.focusID,
+            focusData = layoutData.data[focusID],
             startAngle = focusData.startAngle,
             orderedVisibleNeighbours = focusData.orderedNeighbours;
 
@@ -148,13 +183,14 @@ _.extend(Keyboard.prototype, {
     setCluster: function(cluster) {
         this.cluster = cluster;
         this.cluster.on('FocusChanged', this.onFocusChanged);
+        this.clusterStateChanged(cluster);
     },
 
     onNavKey: function(e) {
         if (e.key == '.') {
             if (e.code == 'NumpadDecimal') {
                 // Numpad decimal is bound to something else
-                numpadDecimal(e);
+                this.trigger('NumpadDecimal', e);
                 return;
             }
             else {
@@ -167,9 +203,13 @@ _.extend(Keyboard.prototype, {
 
         if (this.keyboardContextList && this.cluster) {
             if (keyID == 5) {
-                var parentContext = this.cluster.contexts.get(this.cluster.focusID).getParent();
-                if (parentContext) {
-                    this.cluster.setFocus(parentContext.id, true);
+                var focusContext = this.cluster.contexts.get(this.cluster.focusID);
+
+                if (focusContext) {
+                    var parentContext = focusContext.getParent();
+                    if (parentContext) {
+                        this.cluster.setFocus(parseInt(parentContext.id), true);
+                    }
                 }
                 return;
             }

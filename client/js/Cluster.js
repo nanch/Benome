@@ -168,6 +168,10 @@ _.extend(Cluster.prototype, {
     setFocus: function(newFocusID, render) {
         newFocusID = newFocusID || this.focusID;
 
+        if (!this.contexts.has(newFocusID)) {
+            return;
+        }
+
         if (this.renderedOnce && newFocusID != this.focusID) {
             this.G.trigger('BeforeFocusChanged', this, newFocusID);
             this.trigger('BeforeFocusChanged', this, newFocusID);
@@ -445,8 +449,7 @@ _.extend(Cluster.prototype, {
             if (this.config.setBackgroundFilterLevel) {
                 var transitionDistance = newFilterLevel / this.config.numDetailLevels;
                 bgColor = baseBGColor.transition($.Color('#888'), transitionDistance);
-
-                this.G.setBackgroundColor(filterColor.toHexString());
+                this.G.setBackgroundColor(bgColor.toHexString());
 
                 // 
 
@@ -604,8 +607,8 @@ _.extend(Cluster.prototype, {
             this.G.localSet('LastFocus', this.focusID);
         }
         
-        this.trigger('FocusChanged', this, this.focusID, this.contexts.get(this.focusID), this.lastFocusID, this.contexts.get(this.lastFocusID), layoutData);
         this.lastLayoutData = layoutData;
+        this.trigger('FocusChanged', this, this.focusID, this.contexts.get(this.focusID), this.lastFocusID, this.contexts.get(this.lastFocusID), layoutData);
 
         if (this.lastData) {
             // This doesn't hide everything, as renderViews() applies additional visual limits (maxDepth) that may cutoff traversal
